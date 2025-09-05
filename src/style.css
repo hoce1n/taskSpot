@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 @theme {
-    --color-primary: #C90000;
-    --color-secondary: #FFC300;
-    --color-gray: #7D7C7C;
+  --text-xxs: 0.625rem;
+  --breakpoint-md: 52.5rem;
+  --color-primary: #C90000;
+  --color-secondary: #FFC300;
+  --color-gray: #7D7C7C;
 }
 
 @font-face {

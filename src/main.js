@@ -1,10 +1,12 @@
 import './style.css'
 import { Nav } from './components/nav'
+import { Icons } from './components/icons'
 import { HomePage } from './pages/home';
 import { AboutPage } from './pages/about';
 
 document.addEventListener("DOMContentLoaded", () => {
   const root = document.getElementById("app");
+  root.appendChild(Icons());
   root.appendChild(Nav());
 
   const content = document.createElement("div");
@@ -13,7 +15,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function render(route) {
     content.innerHTML = "";
-    console.log("route:", route);
     if (route === "about") {
       content.appendChild(AboutPage());
     } else {
@@ -22,11 +23,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   document.body.addEventListener("click", (e) => {
-    if (e.target.tagname === "A") {
+    if (e.target.tagName === "A") {
       e.preventDefault();
       const route = e.target.getAttribute("data-route");
       render(route);
     }
   });
-  
+
+    render("home");
+
+    
+
+  const sidebar = document.querySelector(".fixed");
+  const toggleBtn = document.querySelector("#toggleBtn");
+  const overlay = document.querySelector(".overlay");
+
+  toggleBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("!-left-66")
+    overlay.classList.toggle("!hidden")
+  });
+  overlay.addEventListener("click", () => {
+    sidebar.classList.toggle("!-left-66")
+    overlay.classList.toggle("!hidden")
+  })
+
+
 });

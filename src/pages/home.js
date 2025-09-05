@@ -1,7 +1,6 @@
+import { Hero } from "../components/hero";
 export function HomePage() {
-    const home = document.createElement("home");
-    home.innerHTML = `
-    <h1 class="">خانه</h1>
-    `
+    const home = document.createElement("section");
+    home.appendChild(Hero());
     return home;
 }
