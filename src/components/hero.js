@@ -1,18 +1,10 @@
 import hamberger from '/hamberger.png'
+import vector from '/Vector.png'
 
 export function Hero() {
-    const hero = document.createElement("header");
+    const hero = document.createElement("section");
     hero.innerHTML = `
-        <section class="max-w-[1171px]">
-            <div class="max-w-170">
-                <div>
-                    <div class="">
-                        <img src="${hamberger}" width="526px" height="687px" alt="">
-                    </div>
-                </div>
-                <div></div>
-            </div>
-        </section>
+    
     `
     return hero;
 }

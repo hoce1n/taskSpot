@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       content.appendChild(HomePage());
     }
-  }
+  };
 
   document.body.addEventListener("click", (e) => {
     if (e.target.tagName === "A") {
@@ -30,9 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-    render("home");
-
-    
+  render("home");
 
   const sidebar = document.querySelector(".fixed");
   const toggleBtn = document.querySelector("#toggleBtn");
@@ -46,6 +44,5 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar.classList.toggle("!-left-66")
     overlay.classList.toggle("!hidden")
   })
-
-
+  
 });
