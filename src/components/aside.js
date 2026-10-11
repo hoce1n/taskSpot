@@ -35,10 +35,11 @@ const data = {
 }
 
 export function aside() {
-    
+
     const element = document.createElement("aside");
+    element.className = "w-1/3";
     element.innerHTML = `
-        <div class="w-100 space-y-4 mt-4">
+        <div class="space-y-4 mt-4">
             <div>
                 <div class="flex items-center justify-between">
                     <h4 class="font-bold">Good morning, hocein</h4>
