@@ -57,7 +57,7 @@ export function aside() {
                         </li>
                     `
                 )).join(" ")}
-                    <li class="flex items-center gap-3 py-2 px-3 rounded-xl">
+                    <li class="flex items-center gap-3 py-2 px-3 rounded-xl z-1">
                             <i data-lucide="circle-question-mark" class="text-muted-foreground"></i>
                             <span class="text-sm text-muted-foreground">Keyboard shortcuts</span>
                     </li>
@@ -79,12 +79,13 @@ export function aside() {
         root: element
     });
 
-    setTimeout(() => {
-        const li = document.querySelector("li");
-        li.addEventListener("click", () => {
-            li.classList.add("bg-accent");
-        })
+    const list = element.querySelector("ul");
+    list.addEventListener("click", (event) => {        
+       const item = event.target.closest("li");
+
+       if (!item || !list.contains(item)) return;
+
+       item.classList.add("bg-accent");
     })
-    
     return element;
 }

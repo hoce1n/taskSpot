@@ -7,7 +7,7 @@ export function navbar () {
         }
     }
 
-    element.className = "flex justify-between align-items py-3 px-3 lg:px-0 shadow-xs"
+    element.className = "flex justify-between items-center py-3 px-3 lg:px-0 shadow-xs"
 
     element.innerHTML = `
         <strong>${data.appName}</strong>
