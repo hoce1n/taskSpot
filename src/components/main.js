@@ -3,7 +3,8 @@ import {
     Plus, 
     ListChevronsUpDown, 
     Check, 
-    X 
+    X, 
+    Trash
 } from "lucide";
 
 const tasks = [
@@ -63,12 +64,15 @@ export function main() {
                 <i data-lucide="list-chevrons-up-down" class="size-4"></i>
                 <h6 class="text-sm font-semibold">${task.title}</h6>
                 <span class="text-sm">${task.priority}</span>
-                <button class="task-status" id="${task.id}" >
+                <button class="status-task" id="${task.id}" >
                     ${task.isDone ? 
                         `<i data-lucide="check" class="size-4"></i>` 
                     : 
                         `<i data-lucide="x" class="size-4"></i>`
                     }
+                </button>
+                <button class="delete-task cursor-pointer" data-id="${task.id}">
+                    <i data-lucide="trash" class="size-4"></i>
                 </button>
             </div>
         `).join("");
@@ -78,22 +82,33 @@ export function main() {
                 Plus,
                 ListChevronsUpDown,
                 Check,
-                X
+                X,
+                Trash
             },
             root: taskList
         });
     }
 
     taskList.addEventListener("click", (event) => {
-        const button = event.target.closest(".task-status");
+        const statusButton = event.target.closest(".status-task");
+        const deleteButton = event.target.closest(".delete-task");
+        
+        
+        if (statusButton) {
+            const taskId = Number(statusButton.id);
+            const found = tasks.find((task) => task.id === taskId);
 
-        if (!button) return;
-        const taskId = Number(button.id);
-        const found = tasks.find((task) => task.id === taskId);
+            if (!found) return;
 
-        if (!found) return;
-
-        found.isDone = !found.isDone;
+            found.isDone = !found.isDone;
+        } else if (deleteButton) {
+            const taskId = Number(deleteButton.dataset.id);
+            const index = tasks.findIndex((task) => task.id === taskId);
+            console.log(index);
+            if (index !== -1) {
+                tasks.splice(index, 1);
+            }
+        }
         renderTasks(tasks);
     })
 
