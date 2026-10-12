@@ -1,13 +1,12 @@
 export function navbar () {
     const element = document.createElement("nav");
+    element.className = "flex justify-between items-center py-3 px-3 lg:px-0 shadow-xs"
     const data = {
         appName: "task",
         user: {
             name: "hocein",
         }
     }
-
-    element.className = "flex justify-between items-center py-3 px-3 lg:px-0 shadow-xs"
 
     element.innerHTML = `
         <strong>${data.appName}</strong>

@@ -35,7 +35,6 @@ const data = {
 }
 
 export function aside() {
-
     const element = document.createElement("aside");
     element.className = "w-1/3";
     element.innerHTML = `
@@ -86,6 +85,7 @@ export function aside() {
        if (!item || !list.contains(item)) return;
 
        item.classList.add("bg-accent");
-    })
+    });
+    
     return element;
 }

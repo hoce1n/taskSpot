@@ -1,17 +1,26 @@
-import { createIcons, Plus, ListChevronsUpDown, Check } from "lucide";
+import { 
+    createIcons, 
+    Plus, 
+    ListChevronsUpDown, 
+    Check, 
+    X 
+} from "lucide";
 
 const tasks = [
     {
+        id: 1,
         title: "review q1 marketing strategy",
         priority: "high",
         isDone: false
     },
     {
+        id: 2,
         title: "call with design team at 2pm",
         priority: "low",
         isDone: true
     },
     {
+        id: 3,
         title: "upgrade project documentions",
         priority: "low",
         isDone: true
@@ -26,22 +35,20 @@ export function main() {
         <section>
             <form>
                 <div class="flex">
-                <button
-                    type="submit"
-                    class="text-muted-foreground cursor-pointer z-1 flex items-center justify-center w-10"
-                >
-                    <i data-lucide="plus" class="size-6"></i>
-                </button>
-                <input
-                    name="task-title"
-                    type="text"
-                    class="border-dashed border-2 w-full rounded-lg placeholder:text-xs pl-4 py-1.5"
-                    placeholder="Add a task..."
-                />
-
+                    <button
+                        type="submit"
+                        class="text-muted-foreground cursor-pointer z-1 flex items-center justify-center w-10"
+                    >
+                        <i data-lucide="plus" class="size-6"></i>
+                    </button>
+                    <input
+                        name="task-title"
+                        type="text"
+                        class="border-dashed border-2 w-full rounded-lg placeholder:text-xs pl-4 py-1.5"
+                        placeholder="Add a task..."
+                    />
                 </div>
             </form>
-
             <div class="mt-5 space-y-4 task-list"></div>
         </section>
     `;
@@ -56,7 +63,13 @@ export function main() {
                 <i data-lucide="list-chevrons-up-down" class="size-4"></i>
                 <h6 class="text-sm font-semibold">${task.title}</h6>
                 <span class="text-sm">${task.priority}</span>
-                <i data-lucide="check" class="size-4 ${task.isDone ? "" : "invisible"}"></i>
+                <button class="task-status" id="${task.id}" >
+                    ${task.isDone ? 
+                        `<i data-lucide="check" class="size-4"></i>` 
+                    : 
+                        `<i data-lucide="x" class="size-4"></i>`
+                    }
+                </button>
             </div>
         `).join("");
 
@@ -64,11 +77,26 @@ export function main() {
             icons: {
                 Plus,
                 ListChevronsUpDown,
-                Check
+                Check,
+                X
             },
             root: taskList
         });
     }
+
+    taskList.addEventListener("click", (event) => {
+        const button = event.target.closest(".task-status");
+
+        if (!button) return;
+        const taskId = Number(button.id);
+        const found = tasks.find((task) => task.id === taskId);
+
+        if (!found) return;
+
+        found.isDone = !found.isDone;
+        renderTasks(tasks);
+    })
+
 
     createIcons({
         icons: {
@@ -87,6 +115,7 @@ export function main() {
         if (!inputValue || inputValue.length < 3) return;
 
         tasks.push({
+            id: tasks.length + 1,
             title: inputValue,
             priority: "low",
             isDone: false
