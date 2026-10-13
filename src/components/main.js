@@ -6,6 +6,7 @@ import {
     X, 
     Trash
 } from "lucide";
+import { button } from "./ui/button";
 
 const tasks = [
     {
@@ -33,7 +34,8 @@ export function main() {
     element.className = "w-full p-5";
 
     element.innerHTML = `
-        <section>
+        <section class="space-y-5">
+            <div class="filters flex justify-around"></div>
             <form>
                 <div class="flex">
                     <button
@@ -50,14 +52,23 @@ export function main() {
                     />
                 </div>
             </form>
-            <div class="mt-5 space-y-4 task-list"></div>
+            ${tasks.length ? `<div class="mt-5 space-y-4 task-list"></div>` : `<div>تسکی نمونده!</div>`}
         </section>
     `;
 
     const taskList = element.querySelector(".task-list");
     const form = element.querySelector("form");
     const input = form.querySelector("input");
-
+    const filters= element.querySelector(".filters");
+    filters.append(
+        button("all",  { dataset: { filter: "all" } }),
+        button("done", { dataset: { filter: "done" } }),
+        button("active", { dataset: {filter: "active" }})
+    );
+    const b = button("x", { dataset: { taskId: 5 } });
+    console.log(typeof b.dataset.taskId);
+    
+    
     function renderTasks(tasks) {
         taskList.innerHTML = tasks.map((task) => `
             <div class="flex items-center justify-between px-8 py-3 rounded-lg shadow-sm">
@@ -104,7 +115,6 @@ export function main() {
         } else if (deleteButton) {
             const taskId = Number(deleteButton.dataset.id);
             const index = tasks.findIndex((task) => task.id === taskId);
-            console.log(index);
             if (index !== -1) {
                 tasks.splice(index, 1);
             }
