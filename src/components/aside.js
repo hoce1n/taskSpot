@@ -34,6 +34,40 @@ const data = {
     ]
 }
 
+function createSidebarItem(item) {
+    return `
+        <li
+            class="flex items-center gap-3 py-2 px-3 rounded-xl cursor-pointer ${item.hadBorder ? "border mt-6 mb-10" : ""}"
+            data-section="${item.label}"
+        >
+            <i data-lucide="${item.icon}" class="size-5"></i>
+            <span class="text-sm">${item.label}</span>
+        </li>
+    `;
+}
+
+function renderSidebarList(list) {
+    return list.map(createSidebarItem).join("");
+}
+
+
+function handleSidebarClick(event, listElement) {
+    const item = event.target.closest("li");    
+    
+    if (!item || !listElement.contains(item) || !item.dataset.section) return;
+
+    const allItems = listElement.querySelectorAll("li");
+    allItems.forEach((li) => {
+        li.classList.remove("bg-accent");
+    });
+
+    item.classList.add("bg-accent");
+
+    console.log("Selected section:", item.dataset.section);
+    
+    return;
+}
+
 export function aside() {
     const element = document.createElement("aside");
     element.className = "w-1/3";
@@ -48,23 +82,18 @@ export function aside() {
             </div>
             <div>
                 <ul class="space-y-3">
-                ${data.list.map((li) => (
-                    `
-                        <li class="flex items-center gap-3 py-2 px-3 rounded-xl ${li.hadBorder ? "border mt-6 mb-10" : ""}">
-                            <i data-lucide=${li.icon} class="size-5"></i>
-                            <span class="text-sm">${li.label}</span>
-                        </li>
-                    `
-                )).join(" ")}
+                    ${renderSidebarList(data.list)}
                     <li class="flex items-center gap-3 py-2 px-3 rounded-xl z-1">
-                            <i data-lucide="circle-question-mark" class="text-muted-foreground"></i>
-                            <span class="text-sm text-muted-foreground">Keyboard shortcuts</span>
+                        <i data-lucide="circle-question-mark" class="text-muted-foreground"></i>
+                        <span class="text-sm text-muted-foreground">Keyboard shortcuts</span>
                     </li>
                 </ul>
             </div>
-            <div></div>
         </div>
-    `
+    `;
+
+    const listElement = element.querySelector("ul");
+
     createIcons({
         icons: {
             Sun,
@@ -78,14 +107,7 @@ export function aside() {
         root: element
     });
 
-    const list = element.querySelector("ul");
-    list.addEventListener("click", (event) => {        
-       const item = event.target.closest("li");
-
-       if (!item || !list.contains(item)) return;
-
-       item.classList.add("bg-accent");
-    });
+    listElement.addEventListener("click", (event) => handleSidebarClick(event, listElement));
     
     return element;
 }
