@@ -6,6 +6,7 @@ import {
     X, 
     Trash
 } from "lucide";
+
 import { button } from "./ui/button";
 
 const tasks = [
@@ -59,15 +60,13 @@ export function main() {
     const taskList = element.querySelector(".task-list");
     const form = element.querySelector("form");
     const input = form.querySelector("input");
-    const filters= element.querySelector(".filters");
+    const filters = element.querySelector(".filters");
+
     filters.append(
         button("all",  { dataset: { filter: "all" } }),
         button("done", { dataset: { filter: "done" } }),
         button("active", { dataset: {filter: "active" }})
-    );
-    const b = button("x", { dataset: { taskId: 5 } });
-    console.log(typeof b.dataset.taskId);
-    
+    );    
     
     function renderTasks(tasks) {
         taskList.innerHTML = tasks.map((task) => `
@@ -99,6 +98,30 @@ export function main() {
             root: taskList
         });
     }
+
+    filters.addEventListener("click", (event) => {
+        const typeFilter = String(Object.values(event.target.dataset));
+
+        switch (typeFilter) {
+            case "all": {
+                renderTasks(tasks);
+                break;
+            }
+            case "active": {
+                const result = tasks.filter((task) => Boolean(task.isDone) === false);
+                renderTasks(result);
+                break;
+            }
+            case "done": {
+                const result = tasks.filter((task) => Boolean(task.isDone) === true)
+                renderTasks(result);
+                break;
+            }
+            default:
+                console.log('defaultl');
+                break;
+        }
+    })
 
     taskList.addEventListener("click", (event) => {
         const statusButton = event.target.closest(".status-task");
