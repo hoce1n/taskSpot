@@ -30,6 +30,129 @@ const tasks = [
     }
 ];
 
+// 2. State
+let currentFilter = "all";
+
+//3. Helper Function
+function getFilteredTasks() {
+    switch (currentFilter) {
+        case "active":
+            return tasks.filter((task) => !task.isDone);
+        case "done":
+            return tasks.filter((task) => task.isDone);   
+        case "all":
+        default:
+            return tasks;
+    }
+}
+
+function getNextId() {
+    if (tasks.length === 0) return 1;
+    return Math.max(...tasks.map((task) => task.id)) + 1;
+}
+
+function createTaskElement(task) {
+    return `
+        <div class="flex items-center justify-between px-8 py-3 rounded-lg shadow-sm">
+            <i data-lucide="list-chevrons-up-down" class="size-4"></i>
+            <h6 class="text-sm font-semibold ${task.isDone ? "line-through opacity-60" : ""}">
+                ${task.title}
+            </h6>
+            <span class="text-sm">${task.priority}</span>
+            <button class="status-task" data-id="${task.id}">
+                ${task.isDone 
+                    ? `<i data-lucide="check" class="size-4"></i>` 
+                    : `<i data-lucide="x" class="size-4"></i>`
+                }
+            </button>
+            <button class="delete-task cursor-pointer" data-id="${task.id}">
+                <i data-lucide="trash" class="size-4"></i>
+            </button>
+        </div>    
+    `;
+}
+
+// 4. Render Functions
+function renderTasks(taskListElement) {
+    const filtered = getFilteredTasks();
+
+    if (filtered.length === 0) {
+        taskListElement.innerHTML = `<div class="text-muted-foreground text-sm">No tasks found.</div>`;
+        return;
+    }
+
+    taskListElement.innerHTML = filtered.map(createTaskElement).join("");
+
+    createIcons({
+        icons: {
+            ListChevronsUpDown,
+            Check,
+            X,
+            Trash
+        },
+        root: taskListElement
+    });
+}
+
+function renderFilters(filtersElement) {
+    filtersElement.innerHTML = "";
+    filtersElement.append(
+        button("all", { dataset: { filter: "all" } }),
+        button("done", { dataset: { filter: "done" } }),
+        button("active", { dataset: { filter: "active" } })
+    );
+}
+
+// 5. Event Handlers
+function handleAddTask(event, input, taskListElement) {
+    event.preventDefault();
+
+    const title = input.value.trim();
+    if (!title || title.length < 3) return;
+
+    tasks.push({
+        id: getNextId(),
+        title,
+        priority: "low",
+        isDone: false
+    });
+
+    input.value = "";
+    renderTasks(taskListElement);
+}
+
+function handleTaskClick(event, taskListElement) {
+    const statusButton = event.target.closest(".status-task");
+    const deleteButton = event.target.closest(".delete-task");
+
+    if (statusButton) {
+        const taskId = Number(statusButton.dataset.id);
+        const task = tasks.find((t) => t.id === taskId);
+        if (!task) return;
+
+        task.isDone = !task.isDone;
+        renderTasks(taskListElement);
+        return;
+    }
+
+    if (deleteButton) {
+        const taskId = Number(deleteButton.dataset.id);
+        const index = tasks.findIndex((t) => t.id === taskId);
+        if (index === -1) return;
+
+        tasks.splice(index, 1);
+        renderTasks(taskListElement);
+    }
+}
+
+function handleFilterClick(event, taskListElement) {
+    const filter = event.target.dataset.filter;
+    if (!filter) return;
+
+    currentFilter = filter;
+    renderTasks(taskListElement);
+}
+
 export function main() {
     const element = document.createElement("section");
     element.className = "w-full p-5";
@@ -37,6 +160,7 @@ export function main() {
     element.innerHTML = `
         <section class="space-y-5">
             <div class="filters flex justify-around"></div>
+            
             <form>
                 <div class="flex">
                     <button
@@ -53,125 +177,30 @@ export function main() {
                     />
                 </div>
             </form>
-            ${tasks.length ? `<div class="mt-5 space-y-4 task-list"></div>` : `<div>تسکی نمونده!</div>`}
+
+            <div class="mt-5 space-y-4 task-list"></div>
         </section>
     `;
 
-    const taskList = element.querySelector(".task-list");
+    // DOM references
+    const taskListElement = element.querySelector(".task-list");
     const form = element.querySelector("form");
     const input = form.querySelector("input");
-    const filters = element.querySelector(".filters");
+    const filtersElement = element.querySelector(".filters");
 
-    filters.append(
-        button("all",  { dataset: { filter: "all" } }),
-        button("done", { dataset: { filter: "done" } }),
-        button("active", { dataset: {filter: "active" }})
-    );    
-    
-    function renderTasks(tasks) {
-        taskList.innerHTML = tasks.map((task) => `
-            <div class="flex items-center justify-between px-8 py-3 rounded-lg shadow-sm">
-                <i data-lucide="list-chevrons-up-down" class="size-4"></i>
-                <h6 class="text-sm font-semibold">${task.title}</h6>
-                <span class="text-sm">${task.priority}</span>
-                <button class="status-task" id="${task.id}" >
-                    ${task.isDone ? 
-                        `<i data-lucide="check" class="size-4"></i>` 
-                    : 
-                        `<i data-lucide="x" class="size-4"></i>`
-                    }
-                </button>
-                <button class="delete-task cursor-pointer" data-id="${task.id}">
-                    <i data-lucide="trash" class="size-4"></i>
-                </button>
-            </div>
-        `).join("");
-
-        createIcons({
-            icons: {
-                Plus,
-                ListChevronsUpDown,
-                Check,
-                X,
-                Trash
-            },
-            root: taskList
-        });
-    }
-
-    filters.addEventListener("click", (event) => {
-        const typeFilter = String(Object.values(event.target.dataset));
-
-        switch (typeFilter) {
-            case "all": {
-                renderTasks(tasks);
-                break;
-            }
-            case "active": {
-                const result = tasks.filter((task) => Boolean(task.isDone) === false);
-                renderTasks(result);
-                break;
-            }
-            case "done": {
-                const result = tasks.filter((task) => Boolean(task.isDone) === true)
-                renderTasks(result);
-                break;
-            }
-            default:
-                console.log('defaultl');
-                break;
-        }
-    })
-
-    taskList.addEventListener("click", (event) => {
-        const statusButton = event.target.closest(".status-task");
-        const deleteButton = event.target.closest(".delete-task");
-        
-        
-        if (statusButton) {
-            const taskId = Number(statusButton.id);
-            const found = tasks.find((task) => task.id === taskId);
-
-            if (!found) return;
-
-            found.isDone = !found.isDone;
-        } else if (deleteButton) {
-            const taskId = Number(deleteButton.dataset.id);
-            const index = tasks.findIndex((task) => task.id === taskId);
-            if (index !== -1) {
-                tasks.splice(index, 1);
-            }
-        }
-        renderTasks(tasks);
-    })
-
+    // Initial render
+    renderFilters(filtersElement);
+    renderTasks(taskListElement);
 
     createIcons({
-        icons: {
-            Plus
-        },
+        icons: { Plus },
         root: element
     });
 
-    renderTasks(tasks);
-
-    form.addEventListener("submit", (event) => {
-        event.preventDefault();
-
-        const inputValue = input.value.trim();
-
-        if (!inputValue || inputValue.length < 3) return;
-
-        tasks.push({
-            id: tasks.length + 1,
-            title: inputValue,
-            priority: "low",
-            isDone: false
-        });
-
-        renderTasks(tasks);
-        input.value = "";
-    });
+    // Event Listeners
+    form.addEventListener("submit", (e) => handleAddTask(e, input, taskListElement));
+    taskListElement.addEventListener("click", (e) => handleTaskClick(e, taskListElement));
+    filtersElement.addEventListener("click", (e) => handleFilterClick(e, taskListElement));
 
     return element;
 }
