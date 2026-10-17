@@ -3,7 +3,7 @@ import {
     Plus, 
     ListChevronsUpDown, 
     Check, 
-    X, 
+    X,
     Trash
 } from "lucide";
 
@@ -147,9 +147,11 @@ function handleTaskClick(event, taskListElement) {
 
 function handleFilterClick(event, taskListElement) {
     const filter = event.target.dataset.filter;
+    
     if (!filter) return;
 
     currentFilter = filter;
+    
     renderTasks(taskListElement);
 }
 
