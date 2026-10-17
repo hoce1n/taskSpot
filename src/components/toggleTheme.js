@@ -1,18 +1,28 @@
-import { createIcons, SunMoon } from "lucide";
+import { createIcons, Moon, Sun } from "lucide";
 
 export function toggleTheme() {
     const element = document.createElement("button");
     element.type = "button";
-    element.setAttribute("aria-label", "Toggle theme")
-    element.innerHTML = `
-        <i data-lucide="sun-moon" class="size-5"></i>
-    `
-    createIcons({ icons: { SunMoon }, root: element });
+    element.setAttribute("aria-label", "Toggle theme");
+
+    function render(isDark) {
+        element.innerHTML = `
+            <i data-lucide="${isDark ? 'sun' : 'moon'}" class="size-5"></i>
+        `
+        createIcons({
+            icons: { Sun, Moon },
+            root: element
+        });
+    }
+
+    const root = document.documentElement;
 
     element.addEventListener("click", () => {
-        const html = document.querySelector("html");
-        html.classList.toggle("dark");
-    })
+        root.classList.toggle("dark");
+        render(root.classList.contains("dark"));
+    });
+
+    render(root.classList.contains("dark"));
 
     return element;
 }
