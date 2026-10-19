@@ -102,6 +102,19 @@ function renderFilters(filtersElement) {
         button("done", { dataset: { filter: "done" } }),
         button("active", { dataset: { filter: "active" } })
     );
+
+    renderActiveFilter(filtersElement);
+}
+
+function renderActiveFilter(filtersElement) {
+    const filterButtons = filtersElement.querySelectorAll("button");
+
+    filterButtons.forEach((filterButton) => {
+        const isActive = filterButton.dataset.filter === currentFilter;
+        
+        filterButton.classList.toggle("bg-primary!", isActive);
+        filterButton.classList.toggle("text-primary-foreground", isActive);
+    })
 }
 
 // 5. Event Handlers
@@ -146,7 +159,7 @@ function handleTaskClick(event, taskListElement) {
     }
 }
 
-function handleFilterClick(event, taskListElement) {
+function handleFilterClick(event, taskListElement, filtersElement) {
     const filter = event.target.dataset.filter;
     
     if (!filter) return;
@@ -154,6 +167,7 @@ function handleFilterClick(event, taskListElement) {
     currentFilter = filter;
     
     renderTasks(taskListElement);
+    renderActiveFilter(filtersElement)
 }
 
 export function main() {
@@ -193,6 +207,7 @@ export function main() {
 
     // Initial render
     renderFilters(filtersElement);
+    renderActiveFilter(filtersElement);
     renderTasks(taskListElement);
 
     createIcons({
@@ -203,7 +218,7 @@ export function main() {
     // Event Listeners
     form.addEventListener("submit", (e) => handleAddTask(e, input, taskListElement));
     taskListElement.addEventListener("click", (e) => handleTaskClick(e, taskListElement));
-    filtersElement.addEventListener("click", (e) => handleFilterClick(e, taskListElement));
+    filtersElement.addEventListener("click", (e) => handleFilterClick(e, taskListElement, filtersElement));
 
     return element;
 }
