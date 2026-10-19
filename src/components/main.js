@@ -8,6 +8,7 @@ import {
 } from "lucide";
 
 import { button } from "./ui/button";
+import { escapeHtml } from "#lib/utils";
 
 const tasks = [
     {
@@ -56,7 +57,7 @@ function createTaskElement(task) {
         <div class="flex items-center justify-between px-8 py-3 rounded-lg shadow-sm">
             <i data-lucide="list-chevrons-up-down" class="size-4"></i>
             <h6 class="text-sm font-semibold ${task.isDone ? "line-through opacity-60" : ""}">
-                ${task.title}
+                ${escapeHtml(task.title)}
             </h6>
             <span class="text-sm">${task.priority}</span>
             <button class="status-task" data-id="${task.id}">
