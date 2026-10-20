@@ -10,11 +10,30 @@ import {
 import { button } from "./ui/button";
 import { escapeHtml } from "#lib/utils";
 
-// 2. State
+const STORAGE_KEY = "tasks";
+
+// 1. State & Initialization
 let tasks = loadTasks();
 let currentFilter = "all";
 
-//3. Helper Function
+// 2. Helper Function
+function loadTasks() {
+    const item = localStorage.getItem(STORAGE_KEY);
+    if (!item) return [];
+
+    try {
+        const parsed = JSON.parse(item);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (e) {
+        console.warn("Failed to parse tasks form localStorage:", e);
+        return [];
+    }
+}
+
+function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
 function getFilteredTasks() {
     switch (currentFilter) {
         case "active":
@@ -51,30 +70,6 @@ function createTaskElement(task) {
             </button>
         </div>    
     `;
-}
-
-function saveTasks(task) {
-    localStorage.setItem(task.id, JSON.stringify(task));
-}
-
-function loadTasks() {
-    const loaded = [];
-
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        const item = localStorage.getItem(key);
-
-        try {
-            const task = JSON.parse(item);
-            if (task && task.id) {
-                loaded.push(task);
-            }
-        } catch (e) {
-            console.warn(`Skipping key "${key}" - not valid JSON`);
-        }
-    }
-
-    return loaded;
 }
 
 // 4. Render Functions
@@ -135,9 +130,10 @@ function handleAddTask(event, input, taskListElement) {
         isDone: false
     };
 
+    tasks.push(task);
     input.value = "";
-    saveTasks(task);
-    tasks = loadTasks();
+
+    saveTasks();
     renderTasks(taskListElement);
 }
 
@@ -151,9 +147,8 @@ function handleTaskClick(event, taskListElement) {
         if (!task) return;
 
         task.isDone = !task.isDone;
-        saveTasks(task);
 
-        tasks = loadTasks();
+        saveTasks();
         renderTasks(taskListElement);
         return;
     }
@@ -163,9 +158,9 @@ function handleTaskClick(event, taskListElement) {
         const index = tasks.findIndex((t) => t.id === taskId);
         if (index === -1) return;
 
-        localStorage.removeItem(taskId);
-        
-        tasks = loadTasks();
+        tasks.splice(index, 1);
+
+        saveTasks();
         renderTasks(taskListElement);
         return;
     }
