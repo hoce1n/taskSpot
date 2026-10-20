@@ -10,28 +10,8 @@ import {
 import { button } from "./ui/button";
 import { escapeHtml } from "#lib/utils";
 
-const tasks = [
-    {
-        id: 1,
-        title: "review q1 marketing strategy",
-        priority: "high",
-        isDone: false
-    },
-    {
-        id: 2,
-        title: "call with design team at 2pm",
-        priority: "low",
-        isDone: true
-    },
-    {
-        id: 3,
-        title: "upgrade project documentions",
-        priority: "low",
-        isDone: true
-    }
-];
-
 // 2. State
+let tasks = loadTasks();
 let currentFilter = "all";
 
 //3. Helper Function
@@ -71,6 +51,30 @@ function createTaskElement(task) {
             </button>
         </div>    
     `;
+}
+
+function saveTasks(task) {
+    localStorage.setItem(task.id, JSON.stringify(task));
+}
+
+function loadTasks() {
+    const loaded = [];
+
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const item = localStorage.getItem(key);
+
+        try {
+            const task = JSON.parse(item);
+            if (task && task.id) {
+                loaded.push(task);
+            }
+        } catch (e) {
+            console.warn(`Skipping key "${key}" - not valid JSON`);
+        }
+    }
+
+    return loaded;
 }
 
 // 4. Render Functions
@@ -124,14 +128,16 @@ function handleAddTask(event, input, taskListElement) {
     const title = input.value.trim();
     if (!title || title.length < 3) return;
 
-    tasks.push({
+    const task = {
         id: getNextId(),
         title,
         priority: "low",
         isDone: false
-    });
+    };
 
     input.value = "";
+    saveTasks(task);
+    tasks = loadTasks();
     renderTasks(taskListElement);
 }
 
@@ -145,6 +151,9 @@ function handleTaskClick(event, taskListElement) {
         if (!task) return;
 
         task.isDone = !task.isDone;
+        saveTasks(task);
+
+        tasks = loadTasks();
         renderTasks(taskListElement);
         return;
     }
@@ -154,8 +163,11 @@ function handleTaskClick(event, taskListElement) {
         const index = tasks.findIndex((t) => t.id === taskId);
         if (index === -1) return;
 
-        tasks.splice(index, 1);
+        localStorage.removeItem(taskId);
+        
+        tasks = loadTasks();
         renderTasks(taskListElement);
+        return;
     }
 }
 
