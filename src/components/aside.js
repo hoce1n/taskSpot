@@ -1,3 +1,4 @@
+import { getTasks, subscribe } from '#lib/store';
 import { 
     createIcons, 
     Sun, Calendar, 
@@ -34,6 +35,7 @@ const data = {
     ]
 }
 
+
 function createSidebarItem(item) {
     return `
         <li
@@ -50,6 +52,11 @@ function renderSidebarList(list) {
     return list.map(createSidebarItem).join("");
 }
 
+function renderTaskCount(taskCountElement) {
+    const tasks = getTasks();
+    const count = tasks.filter((task) => task.isDone === false).length
+    taskCountElement.textContent = count;
+}
 
 function handleSidebarClick(event, listElement) {
     const item = event.target.closest("li");    
@@ -78,7 +85,7 @@ export function aside() {
                     <h4 class="font-bold">Good morning, hocein</h4>
                     <span class="flex items-center"><i data-lucide="flame" class="w-4 h-4 text-orange-500"></i> 7</span>
                 </div>
-                <p class="text-muted-foreground text-sm">Wednesday, Feb 4 - 5 left today</p>
+                <p class="text-muted-foreground text-sm">Wednesday, Feb 4 - <span data-task-left></span> left today</p>
             </div>
             <div>
                 <ul class="space-y-3">
@@ -93,7 +100,12 @@ export function aside() {
     `;
 
     const listElement = element.querySelector("ul");
+    const taskCountElement = element.querySelector('[data-task-left]')
+    
+    renderTaskCount(taskCountElement);
 
+    subscribe(() => renderTaskCount(taskCountElement));
+    
     createIcons({
         icons: {
             Sun,

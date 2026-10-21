@@ -15,7 +15,8 @@ import {
     isCurrentFilter, 
     getFilteredTasks, 
     setFilter, 
-    toggleTask 
+    toggleTask, 
+    subscribe
 } from "#lib/store";
 
 
@@ -83,15 +84,13 @@ function renderActiveFilter(filtersElement) {
     })
 }
 
-function handleAddTask(event, input, taskListElement) {
+function handleAddTask(event, input) {
     event.preventDefault();
 
     const title = input.value.trim();
     if (!title || title.length < 3) return;
     addTask(title);
     input.value = "";
-
-    renderTasks(taskListElement);
 }
 
 function handleTaskClick(event, taskListElement) {
@@ -109,18 +108,14 @@ function handleTaskClick(event, taskListElement) {
     if (deleteButton) {
         const taskId = Number(deleteButton.dataset.id);
         deleteTask(taskId);
-        renderTasks(taskListElement);
         return;
     }
 }
 
-function handleFilterClick(event, taskListElement, filtersElement) {
+function handleFilterClick(event) {
     const filter = event.target.dataset.filter;
     
     setFilter(filter);
-    
-    renderTasks(taskListElement);
-    renderActiveFilter(filtersElement)
 }
 
 export function main() {
@@ -160,6 +155,9 @@ export function main() {
     renderFilters(filtersElement);
     renderActiveFilter(filtersElement);
     renderTasks(taskListElement);
+
+    subscribe(() => renderTasks(taskListElement));
+    subscribe(() => renderActiveFilter(filtersElement));
 
     createIcons({
         icons: { Plus },

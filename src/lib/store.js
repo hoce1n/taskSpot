@@ -3,6 +3,28 @@ const STORAGE_KEY = "taskspot:tasks";
 let tasks = loadTasks();
 let currentFilter = "all";
 
+const listeners = [];
+
+export function subscribe(listener) {
+    listeners.push(listener);
+
+    return () => {
+        const index = listeners.indexOf(listener);
+        if (index > -1) {
+            listeners.splice(index, 1);
+        }
+    };
+}
+
+function notify() {
+    listeners.forEach(listener => listener());
+}
+
+function commit() {
+    saveTasks();
+    notify();
+}
+
 function getNextId() {
     if (tasks.length === 0) return 1;
     return Math.max(...tasks.map((task) => task.id)) + 1;
@@ -27,6 +49,8 @@ export function isCurrentFilter(filter) {
 export function setFilter(filter) {
     if (!filter) return;
     currentFilter = filter;
+
+    notify();
 }
 
 function loadTasks() {
@@ -60,7 +84,7 @@ export function addTask(title) {
     };
 
     tasks.push(task);
-    saveTasks();
+    commit();
 }
 
 export function toggleTask(id) {
@@ -69,7 +93,7 @@ export function toggleTask(id) {
 
     task.isDone = !task.isDone;
 
-    saveTasks();
+    commit();
 }
 
 export function deleteTask(id) {
@@ -77,5 +101,6 @@ export function deleteTask(id) {
     if (index === -1) return;
 
     tasks.splice(index, 1);
-    saveTasks();
+    commit();
 }
+
