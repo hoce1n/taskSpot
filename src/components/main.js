@@ -9,47 +9,15 @@ import {
 
 import { button } from "./ui/button";
 import { escapeHtml } from "#lib/utils";
+import { 
+    addTask, 
+    deleteTask, 
+    isCurrentFilter, 
+    getFilteredTasks, 
+    setFilter, 
+    toggleTask 
+} from "#lib/store";
 
-const STORAGE_KEY = "tasks";
-
-// 1. State & Initialization
-let tasks = loadTasks();
-let currentFilter = "all";
-
-// 2. Helper Function
-function loadTasks() {
-    const item = localStorage.getItem(STORAGE_KEY);
-    if (!item) return [];
-
-    try {
-        const parsed = JSON.parse(item);
-        return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-        console.warn("Failed to parse tasks form localStorage:", e);
-        return [];
-    }
-}
-
-function saveTasks() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-}
-
-function getFilteredTasks() {
-    switch (currentFilter) {
-        case "active":
-            return tasks.filter((task) => !task.isDone);
-        case "done":
-            return tasks.filter((task) => task.isDone);   
-        case "all":
-        default:
-            return tasks;
-    }
-}
-
-function getNextId() {
-    if (tasks.length === 0) return 1;
-    return Math.max(...tasks.map((task) => task.id)) + 1;
-}
 
 function createTaskElement(task) {
     return `
@@ -72,7 +40,6 @@ function createTaskElement(task) {
     `;
 }
 
-// 4. Render Functions
 function renderTasks(taskListElement) {
     const filtered = getFilteredTasks();
 
@@ -109,31 +76,21 @@ function renderActiveFilter(filtersElement) {
     const filterButtons = filtersElement.querySelectorAll("button");
 
     filterButtons.forEach((filterButton) => {
-        const isActive = filterButton.dataset.filter === currentFilter;
+        const isActive =  isCurrentFilter(filterButton.dataset.filter);
         
         filterButton.classList.toggle("bg-primary!", isActive);
         filterButton.classList.toggle("text-primary-foreground", isActive);
     })
 }
 
-// 5. Event Handlers
 function handleAddTask(event, input, taskListElement) {
     event.preventDefault();
 
     const title = input.value.trim();
     if (!title || title.length < 3) return;
-
-    const task = {
-        id: getNextId(),
-        title,
-        priority: "low",
-        isDone: false
-    };
-
-    tasks.push(task);
+    addTask(title);
     input.value = "";
 
-    saveTasks();
     renderTasks(taskListElement);
 }
 
@@ -143,24 +100,15 @@ function handleTaskClick(event, taskListElement) {
 
     if (statusButton) {
         const taskId = Number(statusButton.dataset.id);
-        const task = tasks.find((t) => t.id === taskId);
-        if (!task) return;
+        toggleTask(taskId);
 
-        task.isDone = !task.isDone;
-
-        saveTasks();
         renderTasks(taskListElement);
         return;
     }
 
     if (deleteButton) {
         const taskId = Number(deleteButton.dataset.id);
-        const index = tasks.findIndex((t) => t.id === taskId);
-        if (index === -1) return;
-
-        tasks.splice(index, 1);
-
-        saveTasks();
+        deleteTask(taskId);
         renderTasks(taskListElement);
         return;
     }
@@ -169,9 +117,7 @@ function handleTaskClick(event, taskListElement) {
 function handleFilterClick(event, taskListElement, filtersElement) {
     const filter = event.target.dataset.filter;
     
-    if (!filter) return;
-
-    currentFilter = filter;
+    setFilter(filter);
     
     renderTasks(taskListElement);
     renderActiveFilter(filtersElement)
@@ -206,13 +152,11 @@ export function main() {
         </section>
     `;
 
-    // DOM references
     const taskListElement = element.querySelector(".task-list");
     const form = element.querySelector("form");
     const input = form.querySelector("input");
     const filtersElement = element.querySelector(".filters");
 
-    // Initial render
     renderFilters(filtersElement);
     renderActiveFilter(filtersElement);
     renderTasks(taskListElement);
@@ -222,7 +166,6 @@ export function main() {
         root: element
     });
 
-    // Event Listeners
     form.addEventListener("submit", (e) => handleAddTask(e, input, taskListElement));
     taskListElement.addEventListener("click", (e) => handleTaskClick(e, taskListElement));
     filtersElement.addEventListener("click", (e) => handleFilterClick(e, taskListElement, filtersElement));
