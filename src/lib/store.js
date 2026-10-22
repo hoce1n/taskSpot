@@ -1,9 +1,24 @@
 const STORAGE_KEY = "taskspot:tasks";
 
 let tasks = loadTasks();
+
 let currentFilter = "all";
+let currentSection = "today";
 
 const listeners = [];
+
+export function isCurrentSection(section) {
+    return currentSection === section;
+}
+
+export function setSection(section) {
+    currentSection = section;
+    notify();
+}
+
+export function getCurrentSection() {
+    return currentSection;
+}
 
 export function subscribe(listener) {
     listeners.push(listener);
@@ -69,7 +84,6 @@ function loadTasks() {
 export function getTasks() {
     return [...tasks];
 }
-
 
 function saveTasks() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));

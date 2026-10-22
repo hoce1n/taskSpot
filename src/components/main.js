@@ -16,7 +16,8 @@ import {
     getFilteredTasks, 
     setFilter, 
     toggleTask, 
-    subscribe
+    subscribe,
+    getCurrentSection,
 } from "#lib/store";
 
 
@@ -84,6 +85,13 @@ function renderActiveFilter(filtersElement) {
     })
 }
 
+function renderTitle(title) {
+    let currentSection = getCurrentSection();
+    
+    title.textContent = currentSection;
+    return (title);
+}
+
 function handleAddTask(event, input) {
     event.preventDefault();
 
@@ -124,6 +132,7 @@ export function main() {
 
     element.innerHTML = `
         <section class="space-y-5">
+            <h1 data-title class="text-2xl font-bold px-4"></h1>
             <div class="filters flex justify-around"></div>
             
             <form>
@@ -151,13 +160,16 @@ export function main() {
     const form = element.querySelector("form");
     const input = form.querySelector("input");
     const filtersElement = element.querySelector(".filters");
+    const title = element.querySelector('[data-title]');    
 
     renderFilters(filtersElement);
     renderActiveFilter(filtersElement);
     renderTasks(taskListElement);
+    renderTitle(title);
 
     subscribe(() => renderTasks(taskListElement));
     subscribe(() => renderActiveFilter(filtersElement));
+    subscribe(() => renderTitle(title));
 
     createIcons({
         icons: { Plus },

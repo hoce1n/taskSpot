@@ -1,4 +1,9 @@
-import { getTasks, subscribe } from '#lib/store';
+import { 
+    getTasks, 
+    isCurrentSection, 
+    setSection, 
+    subscribe 
+} from '#lib/store';
 import { 
     createIcons, 
     Sun, Calendar, 
@@ -35,7 +40,6 @@ const data = {
     ]
 }
 
-
 function createSidebarItem(item) {
     return `
         <li
@@ -58,20 +62,21 @@ function renderTaskCount(taskCountElement) {
     taskCountElement.textContent = count;
 }
 
+function renderActiveSection(listElement) {
+    listElement.querySelectorAll("li").forEach((li) => {
+        const isActive = isCurrentSection(li.dataset.section);
+        li.classList.toggle("bg-accent", isActive);
+    })
+}
+
 function handleSidebarClick(event, listElement) {
-    const item = event.target.closest("li");    
+    const item = event.target.closest("li");
     
-    if (!item || !listElement.contains(item) || !item.dataset.section) return;
-
-    const allItems = listElement.querySelectorAll("li");
-    allItems.forEach((li) => {
-        li.classList.remove("bg-accent");
-    });
-
-    item.classList.add("bg-accent");
-
-    console.log("Selected section:", item.dataset.section);
+    if (!item || 
+        !listElement.contains(item) || 
+        !item.dataset.section) return;
     
+    setSection(item.dataset.section);     
     return;
 }
 
@@ -103,8 +108,10 @@ export function aside() {
     const taskCountElement = element.querySelector('[data-task-left]')
     
     renderTaskCount(taskCountElement);
+    renderActiveSection(listElement);
 
     subscribe(() => renderTaskCount(taskCountElement));
+    subscribe(() => renderActiveSection(listElement));
     
     createIcons({
         icons: {
