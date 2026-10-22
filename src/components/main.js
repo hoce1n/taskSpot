@@ -29,6 +29,7 @@ function createTaskElement(task) {
                 ${escapeHtml(task.title)}
             </h6>
             <span class="text-sm">${task.priority}</span>
+            <span>${task.dueDate ? task.dueDate : ""}</span>
             <button class="status-task" data-id="${task.id}">
                 ${task.isDone 
                     ? `<i data-lucide="check" class="size-4"></i>` 
@@ -92,13 +93,15 @@ function renderTitle(title) {
     return title;
 }
 
-function handleAddTask(event, input) {
+function handleAddTask(event, inputTitle, inputDate) {
     event.preventDefault();
 
-    const title = input.value.trim();
+    const title = inputTitle.value.trim();
+    const dueDate = inputDate.value;
     if (!title || title.length < 3) return;
-    addTask(title);
-    input.value = "";
+    addTask(title, dueDate);
+    inputTitle.value = "";
+    inputDate.value = "";
 }
 
 function handleTaskClick(event, taskListElement) {
@@ -136,7 +139,7 @@ export function main() {
             <div class="filters flex justify-around"></div>
             
             <form>
-                <div class="flex">
+                <div class="flex items-center gap-x-2">
                     <button
                         type="submit"
                         class="text-muted-foreground cursor-pointer z-1 flex items-center justify-center w-10"
@@ -145,9 +148,16 @@ export function main() {
                     </button>
                     <input
                         name="task-title"
+                        data-task-title
                         type="text"
                         class="border-dashed border-2 w-full rounded-lg placeholder:text-xs pl-4 py-1.5"
                         placeholder="Add a task..."
+                    />
+                    <input
+                        name="task-date"
+                        data-task-date
+                        type="date"
+                        class="border rounded-lg pl-4 py-1.5"
                     />
                 </div>
             </form>
@@ -158,7 +168,8 @@ export function main() {
 
     const taskListElement = element.querySelector(".task-list");
     const form = element.querySelector("form");
-    const input = form.querySelector("input");
+    const inputTitle = form.querySelector('[data-task-title]');
+    const inputDate = form.querySelector('[data-task-date]')
     const filtersElement = element.querySelector(".filters");
     const titleElement = element.querySelector('[data-title]');    
 
@@ -176,7 +187,7 @@ export function main() {
         root: element
     });
 
-    form.addEventListener("submit", (e) => handleAddTask(e, input, taskListElement));
+    form.addEventListener("submit", (e) => handleAddTask(e, inputTitle, inputDate, taskListElement));
     taskListElement.addEventListener("click", (e) => handleTaskClick(e, taskListElement));
     filtersElement.addEventListener("click", (e) => handleFilterClick(e, taskListElement, filtersElement));
 

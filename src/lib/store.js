@@ -94,10 +94,14 @@ function saveTasks() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
-export function addTask(title) {
+export function addTask(title, dueDate) {
+    if (dueDate === "" || dueDate === undefined) {
+        dueDate = null;
+    }
     const task = {
         id: getNextId(),
         title,
+        dueDate,
         priority: "low",
         isDone: false
     };
