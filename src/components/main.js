@@ -29,7 +29,7 @@ function createTaskElement(task) {
                 ${escapeHtml(task.title)}
             </h6>
             <span class="text-sm">${task.priority}</span>
-            <span>${task.dueDate ? escapeHtml(dueDate) : ""}</span>
+            <span>${task.dueDate ? escapeHtml(task.dueDate) : ""}</span>
             <button class="status-task" data-id="${task.id}">
                 ${task.isDone 
                     ? `<i data-lucide="check" class="size-4"></i>` 
