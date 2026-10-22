@@ -86,10 +86,10 @@ function renderActiveFilter(filtersElement) {
 }
 
 function renderTitle(title) {
-    let currentSection = getCurrentSection();
+    const currentSection = getCurrentSection();
     
     title.textContent = currentSection;
-    return (title);
+    return title;
 }
 
 function handleAddTask(event, input) {
@@ -160,16 +160,16 @@ export function main() {
     const form = element.querySelector("form");
     const input = form.querySelector("input");
     const filtersElement = element.querySelector(".filters");
-    const title = element.querySelector('[data-title]');    
+    const titleElement = element.querySelector('[data-title]');    
 
     renderFilters(filtersElement);
     renderActiveFilter(filtersElement);
     renderTasks(taskListElement);
-    renderTitle(title);
+    renderTitle(titleElement);
 
     subscribe(() => renderTasks(taskListElement));
     subscribe(() => renderActiveFilter(filtersElement));
-    subscribe(() => renderTitle(title));
+    subscribe(() => renderTitle(titleElement));
 
     createIcons({
         icons: { Plus },

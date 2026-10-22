@@ -34,7 +34,7 @@ const data = {
         },
         {
             icon: "circle-check",
-            label: "Done",
+            label: "done",
             hadBorder: true
         }
     ]
@@ -47,7 +47,7 @@ function createSidebarItem(item) {
             data-section="${item.label}"
         >
             <i data-lucide="${item.icon}" class="size-5"></i>
-            <span class="text-sm">${item.label}</span>
+            <span class="text-sm capitalize">${item.label}</span>
         </li>
     `;
 }

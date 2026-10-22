@@ -7,11 +7,16 @@ let currentSection = "today";
 
 const listeners = [];
 
+const sections = ["today", "tomorrow", "upcoming", "backlog", "done"];
+
 export function isCurrentSection(section) {
     return currentSection === section;
 }
 
 export function setSection(section) {
+    if (!sections.includes(section)) return;
+    if (currentSection === section) return;
+    
     currentSection = section;
     notify();
 }
