@@ -11,7 +11,8 @@ import {
     Form, 
     CircleCheck, 
     Flame,
-    CircleQuestionMark
+    CircleQuestionMark,
+    RedoDot
 } from 'lucide';
 
 const data = {
@@ -33,10 +34,14 @@ const data = {
             label: "backlog"
         },
         {
+            icon: "redo-dot",
+            label: "overdue"
+        },
+        {
             icon: "circle-check",
             label: "done",
             hadBorder: true
-        }
+        },
     ]
 }
 
@@ -121,7 +126,8 @@ export function aside() {
             Form,
             CircleCheck,
             Flame,
-            CircleQuestionMark
+            CircleQuestionMark,
+            RedoDot
         },
         root: element
     });

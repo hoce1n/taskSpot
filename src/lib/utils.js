@@ -9,13 +9,44 @@ export function escapeHtml(value) {
             .replaceAll("'", "&#39;")
 }
 
+export function isValidDateKey(value) {
+   return /^\d{4}-\d{2}-\d{2}$/.test(value)
+}
+
 export function toDateKey(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
     const day = String(date.getDate()).padStart(2, "0");
+    
     return `${year}-${month}-${day}`
 }
 
-export function isValidDateKey(value) {
-   return /^\d{4}-\d{2}-\d{2}$/.test(value)
+export function getDateKeyOffset(days) {
+    const date = new Date();
+    date.setDate(date.getDate() + days);
+    return toDateKey(date);   
+}
+
+export function matchesSection(task, section) {
+   const today = getDateKeyOffset(0);
+   const tomorrow = getDateKeyOffset(1);
+   const { dueDate, isDone } = task;
+   const hasDate = dueDate !== null;
+
+   switch (section) {
+    case "today":
+        return dueDate === today;
+    case "tomorrow":
+        return dueDate === tomorrow;
+    case "upcoming":
+        return hasDate && dueDate > tomorrow;
+    case "overdue":
+        return hasDate && dueDate < today && !isDone;
+    case "backlog":
+        return !hasDate && !isDone;
+    case "done":
+        return isDone;
+    default:
+        return false;
+   }
 }
