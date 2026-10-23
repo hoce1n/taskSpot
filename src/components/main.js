@@ -20,7 +20,6 @@ import {
     getCurrentSection,
 } from "#lib/store";
 
-
 function createTaskElement(task) {
     return `
         <div class="flex items-center justify-between px-8 py-3 rounded-lg shadow-sm">
@@ -96,12 +95,13 @@ function renderTitle(title) {
 function handleAddTask(event, inputTitle, inputDate) {
     event.preventDefault();
 
-    const title = inputTitle.value.trim();
-    const dueDate = inputDate.value;
-    if (!title || title.length < 3) return;
-    addTask(title, dueDate);
-    inputTitle.value = "";
-    inputDate.value = "";
+    const result = addTask(inputTitle.value, inputDate.value);
+    if (!result.success) {
+        alert(result.message)
+    } else {
+        inputTitle.value = "";
+        inputDate.value = "";
+    }
 }
 
 function handleTaskClick(event, taskListElement) {

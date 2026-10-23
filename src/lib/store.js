@@ -1,4 +1,7 @@
+import { isValidDateKey, toDateKey } from "./utils";
+
 const STORAGE_KEY = "taskspot:tasks";
+const MIN_TITLE_LENGTH = 3;
 
 let tasks = loadTasks();
 
@@ -95,19 +98,32 @@ function saveTasks() {
 }
 
 export function addTask(title, dueDate) {
-    if (dueDate === "" || dueDate === undefined) {
+    if (title.trim().length < MIN_TITLE_LENGTH) {
+        return { 
+            success: false, 
+            message: "title is invalid."
+        }
+    }
+    if (dueDate === "" || dueDate == undefined) {
         dueDate = null;
+    } else if (!isValidDateKey(dueDate)) {
+        return {
+            success: false,
+            message: "date is invalid!"
+        }
     }
     const task = {
         id: getNextId(),
-        title,
+        title: title.trim(),
         dueDate,
         priority: "low",
         isDone: false
     };
-
     tasks.push(task);
     commit();
+    return {
+        success: true
+    }
 }
 
 export function toggleTask(id) {
