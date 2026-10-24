@@ -4,6 +4,7 @@ import {
     setSection, 
     subscribe 
 } from '#lib/store';
+import { getGreeting } from '#lib/utils';
 import { 
     createIcons, 
     Sun, Calendar, 
@@ -91,10 +92,10 @@ export function aside() {
         <div class="space-y-4 mt-4 hidden md:block">
             <div>
                 <div class="flex items-center justify-between">
-                    <h4 class="font-bold">Good morning, hocein</h4>
+                    <h4 class="font-bold">Good ${getGreeting(new Date().getHours())}, hocein</h4>
                     <span class="flex items-center"><i data-lucide="flame" class="w-4 h-4 text-orange-500"></i> 7</span>
                 </div>
-                <p class="text-muted-foreground text-sm">${new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })} - <span data-task-left></span> left today</p>
+                <p class="text-muted-foreground text-sm">${new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} - <span data-task-left></span> left today</p>
             </div>
             <div>
                 <ul class="space-y-3">
