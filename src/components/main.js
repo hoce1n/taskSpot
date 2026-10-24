@@ -92,15 +92,16 @@ function renderTitle(title) {
     return title;
 }
 
-function handleAddTask(event, inputTitle, inputDate) {
+function handleAddTask(event, inputTitle, inputDate, selectElement) {
     event.preventDefault();
-
-    const result = addTask(inputTitle.value, inputDate.value);
+    
+    const result = addTask(inputTitle.value, inputDate.value, selectElement.value);
     if (!result.success) {
         alert(result.message)
     } else {
         inputTitle.value = "";
         inputDate.value = "";
+        selectElement.value = "low";
     }
 }
 
@@ -139,26 +140,38 @@ export function main() {
             <div class="filters flex justify-around"></div>
             
             <form>
-                <div class="flex items-center gap-x-2">
-                    <button
-                        type="submit"
-                        class="text-muted-foreground cursor-pointer z-1 flex items-center justify-center bg-accent p-1"
-                    >
-                        <i data-lucide="plus" class="size-8"></i>
-                    </button>
-                    <input
-                        name="task-title"
-                        data-task-title
-                        type="text"
-                        class="border-dashed border-2 w-full placeholder:text-xs pl-4 py-1.5"
-                        placeholder="Add a task..."
-                    />
+                <div class="flex flex-col gap-y-2 md:flex-row *:w-full items-center gap-x-2">
+                    <div class="flex">
+                        <button
+                            type="submit"
+                            class="text-muted-foreground cursor-pointer border-2 border-dashed border-r-0 bg-accent flex items-center justify-center p-1"
+                        >
+                            <i data-lucide="plus" class="size-8"></i>
+                        </button>
+                        <input
+                            name="task-title"
+                            data-task-title
+                            type="text"
+                            required
+                            class="border-dashed border-2 w-full placeholder:text-xs pl-4 py-1.5"
+                            placeholder="Add a task..."
+                        />
+                    </div>
                     <input
                         name="task-date"
                         data-task-date
                         type="date"
                         class="border pl-4 py-1.5"
                     />
+                    <select 
+                        name="task-priority"
+                        data-task-priority
+                        class="border pl-4 py-1.5"
+                    >
+                        <option value="low">Low</option>
+                        <option value="medium">Medium</option>
+                        <option value="high">High</option>
+                    </select>                    
                 </div>
             </form>
 
@@ -171,7 +184,8 @@ export function main() {
     const inputTitle = form.querySelector('[data-task-title]');
     const inputDate = form.querySelector('[data-task-date]')
     const filtersElement = element.querySelector(".filters");
-    const titleElement = element.querySelector('[data-title]');    
+    const titleElement = element.querySelector('[data-title]'); 
+    const selectElement = element.querySelector('[data-task-priority]');    
 
     renderFilters(filtersElement);
     renderActiveFilter(filtersElement);
@@ -187,7 +201,7 @@ export function main() {
         root: element
     });
 
-    form.addEventListener("submit", (e) => handleAddTask(e, inputTitle, inputDate, taskListElement));
+    form.addEventListener("submit", (e) => handleAddTask(e, inputTitle, inputDate, selectElement));
     taskListElement.addEventListener("click", (e) => handleTaskClick(e, taskListElement));
     filtersElement.addEventListener("click", (e) => handleFilterClick(e, taskListElement, filtersElement));
 

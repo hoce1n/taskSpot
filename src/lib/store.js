@@ -12,6 +12,8 @@ const listeners = [];
 
 const sections = ["today", "tomorrow", "upcoming", "backlog", "overdue", "done"];
 
+const priorities = ["low", "medium", "high"];
+
 export function isCurrentSection(section) {
     return currentSection === section;
 }
@@ -104,7 +106,7 @@ function saveTasks() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
-export function addTask(title, dueDate) {
+export function addTask(title, dueDate, priority) {
     if (title.trim().length < MIN_TITLE_LENGTH) {
         return { 
             success: false, 
@@ -119,11 +121,16 @@ export function addTask(title, dueDate) {
             message: "date is invalid!"
         }
     }
+    if (!priorities.includes(priority)) return {
+        success: false,
+        message: "priority is not valid."
+    };
+    
     const task = {
         id: getNextId(),
         title: title.trim(),
         dueDate,
-        priority: "low",
+        priority,
         isDone: false
     };
     tasks.push(task);
