@@ -20,14 +20,22 @@ import {
     getCurrentSection,
 } from "#lib/store";
 
+const priorityColors = {
+    low: 'bg-blue-400 text-background',
+    medium: 'bg-yellow-100 text-yellow-800',
+    high: 'bg-destructive text-background'
+};
+
 function createTaskElement(task) {
+    const colorClass = priorityColors[task.priority];
+    
     return `
         <div class="flex items-center justify-between px-8 py-3 shadow-sm border h-15">
             <i data-lucide="list-chevrons-up-down" class="size-4"></i>
             <h6 class="text-sm font-semibold ${task.isDone ? "line-through opacity-60" : ""}">
                 ${escapeHtml(task.title)}
             </h6>
-            <span class="text-sm">${task.priority}</span>
+            <span class="text-sm p-1 ${colorClass || ""}">${escapeHtml(task.priority)}</span>
             <span>${task.dueDate ? escapeHtml(task.dueDate) : ""}</span>
             <button class="status-task" data-id="${task.id}">
                 ${task.isDone 
