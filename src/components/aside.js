@@ -48,7 +48,7 @@ const data = {
 function createSidebarItem(item) {
     return `
         <li
-            class="flex items-center gap-3 py-2 px-3 rounded-xl cursor-pointer ${item.hadBorder ? "border mt-6 mb-10" : ""}"
+            class="flex items-center gap-3 py-2 px-3 cursor-pointer ${item.hadBorder ? "border mt-6 mb-10" : ""}"
             data-section="${item.label}"
         >
             <i data-lucide="${item.icon}" class="size-5"></i>
@@ -88,18 +88,18 @@ export function aside() {
     const element = document.createElement("aside");
     element.className = "w-1/3";
     element.innerHTML = `
-        <div class="space-y-4 mt-4">
+        <div class="space-y-4 mt-4 hidden md:block">
             <div>
                 <div class="flex items-center justify-between">
                     <h4 class="font-bold">Good morning, hocein</h4>
                     <span class="flex items-center"><i data-lucide="flame" class="w-4 h-4 text-orange-500"></i> 7</span>
                 </div>
-                <p class="text-muted-foreground text-sm">Wednesday, Feb 4 - <span data-task-left></span> left today</p>
+                <p class="text-muted-foreground text-sm">${new Date().toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })} - <span data-task-left></span> left today</p>
             </div>
             <div>
                 <ul class="space-y-3">
                     ${renderSidebarList(data.list)}
-                    <li class="flex items-center gap-3 py-2 px-3 rounded-xl z-1">
+                    <li class="flex items-center gap-3 py-2 px-3 z-1">
                         <i data-lucide="circle-question-mark" class="text-muted-foreground"></i>
                         <span class="text-sm text-muted-foreground">Keyboard shortcuts</span>
                     </li>

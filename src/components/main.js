@@ -22,7 +22,7 @@ import {
 
 function createTaskElement(task) {
     return `
-        <div class="flex items-center justify-between px-8 py-3 rounded-lg shadow-sm">
+        <div class="flex items-center justify-between px-8 py-3 shadow-sm border h-15">
             <i data-lucide="list-chevrons-up-down" class="size-4"></i>
             <h6 class="text-sm font-semibold ${task.isDone ? "line-through opacity-60" : ""}">
                 ${escapeHtml(task.title)}
@@ -66,9 +66,9 @@ function renderTasks(taskListElement) {
 function renderFilters(filtersElement) {
     filtersElement.innerHTML = "";
     filtersElement.append(
-        button("all", { dataset: { filter: "all" } }),
-        button("done", { dataset: { filter: "done" } }),
-        button("active", { dataset: { filter: "active" } })
+        button("all", { dataset: { filter: "all" }, className: "w-full" }),
+        button("done", { dataset: { filter: "done" }, className: "w-full" }),
+        button("active", { dataset: { filter: "active" }, className: "w-full" })
     );
 
     renderActiveFilter(filtersElement);
@@ -135,29 +135,29 @@ export function main() {
 
     element.innerHTML = `
         <section class="space-y-5">
-            <h1 data-title class="text-2xl font-bold px-4"></h1>
+            <h1 data-title class="text-3xl font-bold px-4 tracking-widest uppercase"></h1>
             <div class="filters flex justify-around"></div>
             
             <form>
                 <div class="flex items-center gap-x-2">
                     <button
                         type="submit"
-                        class="text-muted-foreground cursor-pointer z-1 flex items-center justify-center w-10"
+                        class="text-muted-foreground cursor-pointer z-1 flex items-center justify-center bg-accent p-1"
                     >
-                        <i data-lucide="plus" class="size-6"></i>
+                        <i data-lucide="plus" class="size-8"></i>
                     </button>
                     <input
                         name="task-title"
                         data-task-title
                         type="text"
-                        class="border-dashed border-2 w-full rounded-lg placeholder:text-xs pl-4 py-1.5"
+                        class="border-dashed border-2 w-full placeholder:text-xs pl-4 py-1.5"
                         placeholder="Add a task..."
                     />
                     <input
                         name="task-date"
                         data-task-date
                         type="date"
-                        class="border rounded-lg pl-4 py-1.5"
+                        class="border pl-4 py-1.5"
                     />
                 </div>
             </form>

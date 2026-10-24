@@ -1,4 +1,4 @@
-const BASE_CLASSES = "cursor-pointer bg-secondary px-4 py-2 rounded-lg";
+const BASE_CLASSES = "cursor-pointer bg-secondary px-4 py-2 rounded-none";
 
 export function button(
     inner,
