@@ -28,25 +28,25 @@ export function getDateKeyOffset(days) {
 }
 
 export function matchesSection(task, section) {
-   const today = getDateKeyOffset(0);
-   const tomorrow = getDateKeyOffset(1);
-   const { dueDate, isDone } = task;
-   const hasDate = dueDate !== null;
+    const today = getDateKeyOffset(0);
+    const tomorrow = getDateKeyOffset(1);
+    const { dueDate, isDone } = task;
+    const hasDate = dueDate !== null;
 
-   switch (section) {
-    case "today":
-        return dueDate === today;
-    case "tomorrow":
-        return dueDate === tomorrow;
-    case "upcoming":
-        return hasDate && dueDate > tomorrow;
-    case "overdue":
-        return hasDate && dueDate < today && !isDone;
-    case "backlog":
-        return !hasDate && !isDone;
-    case "done":
-        return isDone;
-    default:
-        return false;
-   }
+    switch (section) {
+        case "today":
+            return dueDate === today;
+        case "tomorrow":
+            return dueDate === tomorrow;
+        case "upcoming":
+            return hasDate && dueDate > tomorrow;
+        case "overdue":
+            return hasDate && dueDate < today && !isDone;
+        case "backlog":
+            return !hasDate && !isDone;
+        case "done":
+            return isDone;
+        default:
+            return false;
+    }
 }

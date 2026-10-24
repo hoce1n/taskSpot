@@ -1,5 +1,5 @@
 import { 
-    getTasks, 
+    getTodayLeftTasks, 
     isCurrentSection, 
     setSection, 
     subscribe 
@@ -62,9 +62,8 @@ function renderSidebarList(list) {
 }
 
 function renderTaskCount(taskCountElement) {
-    const tasks = getTasks();
-    const count = tasks.filter((task) => task.isDone === false).length
-    taskCountElement.textContent = count;
+    const count = getTodayLeftTasks()
+    taskCountElement.textContent = count.length;
 }
 
 function renderActiveSection(listElement) {

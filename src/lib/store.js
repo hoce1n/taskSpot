@@ -1,4 +1,4 @@
-import { isValidDateKey, matchesSection, toDateKey } from "./utils";
+import { isValidDateKey, matchesSection } from "./utils";
 
 const STORAGE_KEY = "taskspot:tasks";
 const MIN_TITLE_LENGTH = 3;
@@ -55,7 +55,7 @@ function getNextId() {
 
 export function getFilteredTasks() {
     const inSection = tasks.filter((task) => matchesSection(task, currentSection));
-
+    
     switch (currentFilter) {
         case "active":
             return inSection.filter((task) => !task.isDone);
@@ -65,6 +65,11 @@ export function getFilteredTasks() {
         default:
             return inSection;
     }
+}
+
+export function getTodayLeftTasks() {
+    const todayNotDone = tasks.filter((task) => matchesSection(task, "today") && task.isDone !== true);
+    return todayNotDone;
 }
 
 export function isCurrentFilter(filter) {
