@@ -1,4 +1,4 @@
-import { isValidDateKey, matchesSection } from "./utils";
+import { isValidDateKey, matchesSection, toDateKey } from "./utils";
 
 const STORAGE_KEY = "taskspot:tasks";
 const NAME_KEY = "taskspot:name";
@@ -109,6 +109,16 @@ function loadTasks() {
     }
 }
 
+export function getCompletedTasksDate() {
+    let completedTasksDate = new Set([]);
+    tasks.forEach((task) => {
+        completedTasksDate.add(task.completedAt);
+    })
+
+    return completedTasksDate;
+}
+
+
 export function getTasks() {
     return [...tasks];
 }
@@ -142,7 +152,8 @@ export function addTask(title, dueDate, priority) {
         title: title.trim(),
         dueDate,
         priority,
-        isDone: false
+        isDone: false,
+        completedAt: null
     };
     tasks.push(task);
     commit();
@@ -156,6 +167,7 @@ export function toggleTask(id) {
     if (!task) return;
 
     task.isDone = !task.isDone;
+    task.completedAt = task.isDone ? toDateKey(new Date()) : null;
 
     commit();
 }

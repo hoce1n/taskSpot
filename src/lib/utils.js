@@ -27,6 +27,19 @@ export function getDateKeyOffset(days) {
     return toDateKey(date);   
 }
 
+export function calculateStreak(dateKeys) {
+    const set = new Set(dateKeys);
+    let offset = set.has(getDateKeyOffset(0)) ? 0 : 1;
+    let count = 0;
+
+    while (set.has(getDateKeyOffset(-offset))) {
+        count++;
+        offset++;
+    }
+
+    return count;
+}
+
 export function matchesSection(task, section) {
     const today = getDateKeyOffset(0);
     const tomorrow = getDateKeyOffset(1);

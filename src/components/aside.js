@@ -6,7 +6,7 @@ import {
     setUserName, 
     subscribe 
 } from '#lib/store';
-import { getGreeting } from '#lib/utils';
+import { calculateStreak, getGreeting } from '#lib/utils';
 import { 
     createIcons, 
     Sun, Calendar, 
@@ -80,6 +80,10 @@ function renderUserName(userNameElement) {
     userNameElement.textContent = getUserName();
 }
 
+function renderStreakCount(streakCountElement) {
+    streakCountElement.textContent = calculateStreak(getTodayLeftTasks());
+}
+
 function handleSidebarClick(event, listElement) {
     const item = event.target.closest("li");
     
@@ -107,8 +111,11 @@ export function aside() {
             <div>
                 <div class="flex items-center justify-between">
                     <h4 class="font-bold">Good ${getGreeting(new Date().getHours())}, <span data-user-name class="cursor-pointer" title="Click on me."></span></h4>
-                    <span class="flex items-center"><i data-lucide="flame" class="w-4 h-4 text-orange-500"></i> 7</span>
-                </div>
+                    <span class="flex items-center gap-x-0.5">
+                        <i data-lucide="flame" class="w-4 h-4 text-orange-500 fill-orange-500"></i> 
+                        <b class="font-bold mt-0.5" data-streak></b>
+                    </span>
+                    </div>
                 <p class="text-muted-foreground text-sm">${new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} - <span data-task-left></span> left today</p>
             </div>
             <div>
@@ -126,14 +133,17 @@ export function aside() {
     const listElement = element.querySelector("ul");
     const taskCountElement = element.querySelector('[data-task-left]')
     const userNameElement = element.querySelector('[data-user-name]');
+    const streakCountElement = element.querySelector('[data-streak]');
     
     renderTaskCount(taskCountElement);
     renderActiveSection(listElement);
     renderUserName(userNameElement);
+    renderStreakCount(streakCountElement);
 
     subscribe(() => renderTaskCount(taskCountElement));
     subscribe(() => renderActiveSection(listElement));
     subscribe(() => renderUserName(userNameElement));
+    subscribe(() => renderStreakCount(streakCountElement));
     
     createIcons({
         icons: {
