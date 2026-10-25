@@ -1,7 +1,9 @@
 import { 
     getTodayLeftTasks, 
+    getUserName, 
     isCurrentSection, 
     setSection, 
+    setUserName, 
     subscribe 
 } from '#lib/store';
 import { getGreeting } from '#lib/utils';
@@ -73,6 +75,10 @@ function renderActiveSection(listElement) {
         li.classList.toggle("bg-accent", isActive);
     })
 }
+ 
+function renderUserName(userNameElement) {
+    userNameElement.textContent = getUserName();
+}
 
 function handleSidebarClick(event, listElement) {
     const item = event.target.closest("li");
@@ -85,6 +91,14 @@ function handleSidebarClick(event, listElement) {
     return;
 }
 
+function handleSetUserName () {
+    const name = prompt("tell me about ur name.", getUserName());
+    const result = setUserName(name);
+    if (!result.success) {
+        alert(result.message);
+    }
+}
+
 export function aside() {
     const element = document.createElement("aside");
     element.className = "w-1/3";
@@ -92,7 +106,7 @@ export function aside() {
         <div class="space-y-4 mt-4 hidden md:block">
             <div>
                 <div class="flex items-center justify-between">
-                    <h4 class="font-bold">Good ${getGreeting(new Date().getHours())}, hocein</h4>
+                    <h4 class="font-bold">Good ${getGreeting(new Date().getHours())}, <span data-user-name class="cursor-pointer" title="Click on me."></span></h4>
                     <span class="flex items-center"><i data-lucide="flame" class="w-4 h-4 text-orange-500"></i> 7</span>
                 </div>
                 <p class="text-muted-foreground text-sm">${new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} - <span data-task-left></span> left today</p>
@@ -111,12 +125,15 @@ export function aside() {
 
     const listElement = element.querySelector("ul");
     const taskCountElement = element.querySelector('[data-task-left]')
+    const userNameElement = element.querySelector('[data-user-name]');
     
     renderTaskCount(taskCountElement);
     renderActiveSection(listElement);
+    renderUserName(userNameElement);
 
     subscribe(() => renderTaskCount(taskCountElement));
     subscribe(() => renderActiveSection(listElement));
+    subscribe(() => renderUserName(userNameElement));
     
     createIcons({
         icons: {
@@ -133,6 +150,7 @@ export function aside() {
     });
 
     listElement.addEventListener("click", (event) => handleSidebarClick(event, listElement));
+    userNameElement.addEventListener("click", (event) => handleSetUserName());
     
     return element;
 }

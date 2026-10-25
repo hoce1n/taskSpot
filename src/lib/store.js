@@ -1,18 +1,29 @@
 import { isValidDateKey, matchesSection } from "./utils";
 
 const STORAGE_KEY = "taskspot:tasks";
+const NAME_KEY = "taskspot:name";
 const MIN_TITLE_LENGTH = 3;
-
 let tasks = loadTasks();
-
 let currentFilter = "all";
 let currentSection = "today";
-
 const listeners = [];
-
 const sections = ["today", "tomorrow", "upcoming", "backlog", "overdue", "done"];
-
 const priorities = ["low", "medium", "high"];
+
+export function getUserName() {
+    const name = localStorage.getItem(NAME_KEY) ?? "User";
+    return name;
+}
+
+export function setUserName(name) {
+    if (name === null) return { success: true }
+    if (!name || name.trim().length < 2 || name.trim().length > 32) return {
+        success: false, message: "name is invalid"
+    }
+    localStorage.setItem(NAME_KEY, name.trim());
+    notify();
+    return { success: true }
+}
 
 export function isCurrentSection(section) {
     return currentSection === section;
