@@ -113,7 +113,7 @@ function handleAddTask(event, inputTitle, inputDate, selectElement) {
     }
 }
 
-function handleTaskClick(event, taskListElement) {
+function handleTaskClick(event) {
     const statusButton = event.target.closest(".status-task");
     const deleteButton = event.target.closest(".delete-task");
 
@@ -121,7 +121,6 @@ function handleTaskClick(event, taskListElement) {
         const taskId = Number(statusButton.dataset.id);
         toggleTask(taskId);
 
-        renderTasks(taskListElement);
         return;
     }
 
@@ -210,8 +209,16 @@ export function main() {
     });
 
     form.addEventListener("submit", (e) => handleAddTask(e, inputTitle, inputDate, selectElement));
-    taskListElement.addEventListener("click", (e) => handleTaskClick(e, taskListElement));
-    filtersElement.addEventListener("click", (e) => handleFilterClick(e, taskListElement, filtersElement));
+    taskListElement.addEventListener("click", (e) => handleTaskClick(e));
+    filtersElement.addEventListener("click", (e) => handleFilterClick(e));
+    document.addEventListener("keydown", (e) => {
+        const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName);
+        if (e.key !== 'n' || isTyping) return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+        e.preventDefault();
+        inputTitle.focus();
+    })
 
     return element;
 }

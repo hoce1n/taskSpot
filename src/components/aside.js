@@ -1,4 +1,5 @@
 import { 
+    getCompletedTasksDate,
     getTodayLeftTasks, 
     getUserName, 
     isCurrentSection, 
@@ -81,7 +82,7 @@ function renderUserName(userNameElement) {
 }
 
 function renderStreakCount(streakCountElement) {
-    streakCountElement.textContent = calculateStreak(getTodayLeftTasks());
+    streakCountElement.textContent = calculateStreak(getCompletedTasksDate());
 }
 
 function handleSidebarClick(event, listElement) {
