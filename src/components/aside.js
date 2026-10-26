@@ -49,6 +49,19 @@ const data = {
     ]
 }
 
+const shortcuts = [
+    { key: "n", label: "New task" }
+];
+
+function createShortcutItem(shortcut) {
+    return `
+        <div class="flex items-center justify-between gap-8">
+            <span class="text-sm">${shortcut.label}</span>
+            <kbd class="border px-2 py-0.5 text-xs">${shortcut.key}</kbd>
+        </div>
+    `
+}
+
 function createSidebarItem(item) {
     return `
         <li
@@ -85,15 +98,17 @@ function renderStreakCount(streakCountElement) {
     streakCountElement.textContent = calculateStreak(getCompletedTasksDate());
 }
 
-function handleSidebarClick(event, listElement) {
+function handleSidebarClick(event, listElement, dialogElement) {
     const item = event.target.closest("li");
     
-    if (!item || 
-        !listElement.contains(item) || 
-        !item.dataset.section) return;
-    
+    if (!item || !listElement.contains(item)) return;
+    if (item.dataset.action === "shortcuts") {
+        dialogElement.showModal();
+        return;
+    }
+    if (!item.dataset.section) return;
+
     setSection(item.dataset.section);     
-    return;
 }
 
 function handleSetUserName () {
@@ -122,12 +137,21 @@ export function aside() {
             <div>
                 <ul class="space-y-3">
                     ${renderSidebarList(data.list)}
-                    <li class="flex items-center gap-3 py-2 px-3 z-1">
+                    <li class="flex items-center gap-3 py-2 px-3 z-1 cursor-pointer" data-action="shortcuts">
                         <i data-lucide="circle-question-mark" class="text-muted-foreground"></i>
                         <span class="text-sm text-muted-foreground">Keyboard shortcuts</span>
                     </li>
                 </ul>
             </div>
+            <dialog data-shortcuts-dialog class="m-auto p-6 border bg-background text-foreground backdrop:bg-black/50">
+                <h2 class="font-bold mb-4">Keyboard shortcuts</h2>
+                <div class="space-y-2 mb-6">
+                    ${shortcuts.map((shortcut) => createShortcutItem(shortcut)).join("")}
+                </div>
+                <form method="dialog">
+                    <button class="border px-3 py-1 cursor-pointer">Close</button>
+                </form>
+            </dialog>
         </div>
     `;
 
@@ -135,6 +159,7 @@ export function aside() {
     const taskCountElement = element.querySelector('[data-task-left]')
     const userNameElement = element.querySelector('[data-user-name]');
     const streakCountElement = element.querySelector('[data-streak]');
+    const dialogElement = element.querySelector('[data-shortcuts-dialog]');
     
     renderTaskCount(taskCountElement);
     renderActiveSection(listElement);
@@ -160,8 +185,9 @@ export function aside() {
         root: element
     });
 
-    listElement.addEventListener("click", (event) => handleSidebarClick(event, listElement));
+    listElement.addEventListener("click", (event) => handleSidebarClick(event, listElement, dialogElement));
     userNameElement.addEventListener("click", (event) => handleSetUserName());
     
     return element;
 }
+
