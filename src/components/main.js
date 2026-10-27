@@ -4,7 +4,8 @@ import {
     ListChevronsUpDown, 
     Check, 
     X,
-    Trash
+    Trash,
+    Edit
 } from "lucide";
 
 import { button } from "./ui/button";
@@ -18,6 +19,8 @@ import {
     toggleTask, 
     subscribe,
     getCurrentSection,
+    updateTask,
+    getTask,
 } from "#lib/store";
 
 const priorityColors = {
@@ -25,6 +28,8 @@ const priorityColors = {
     medium: 'bg-yellow-100 text-yellow-800',
     high: 'bg-destructive text-background'
 };
+
+let editingTaskId = null;
 
 function createTaskElement(task) {
     const colorClass = priorityColors[task.priority];
@@ -43,11 +48,30 @@ function createTaskElement(task) {
                     : `<i data-lucide="x" class="size-4"></i>`
                 }
             </button>
-            <button class="delete-task cursor-pointer" data-id="${task.id}">
-                <i data-lucide="trash" class="size-4"></i>
-            </button>
+            <div class="flex items-center gap-x-0.5">
+                <button class="delete-task cursor-pointer" data-id="${task.id}">
+                    <i data-lucide="trash" class="size-4"></i>
+                </button>
+                <button class="cursor-pointer" data-id="${task.id}" data-update-task>
+                    <i data-lucide="edit" class="size-4"></i>
+                </button>
+            </div>
         </div>    
     `;
+}
+
+function resetForm(formElements) {
+    formElements.inputTitle.value = "";
+    formElements.inputDate.value = "";
+    formElements.selectElement.value = "low";
+    formElements.editingTaskId = null;
+}
+
+function renderAddOrUpdateButton(addOrUpdateElement) {
+    const icon = editingTaskId !== null ? "edit" : "plus";
+    
+    addOrUpdateElement.innerHTML = `<i data-lucide="${icon}" class="size-8"></i>`
+    createIcons({ icons: { Plus, Edit }, root: addOrUpdateElement });
 }
 
 function renderTasks(taskListElement) {
@@ -65,7 +89,8 @@ function renderTasks(taskListElement) {
             ListChevronsUpDown,
             Check,
             X,
-            Trash
+            Trash,
+            Edit
         },
         root: taskListElement
     });
@@ -100,22 +125,35 @@ function renderTitle(title) {
     return title;
 }
 
-function handleAddTask(event, inputTitle, inputDate, selectElement) {
+function handleAddOrUpdateTask(event, formElements) {
     event.preventDefault();
-    
-    const result = addTask(inputTitle.value, inputDate.value, selectElement.value);
-    if (!result.success) {
-        alert(result.message)
+
+    if (editingTaskId === null) {
+        const result = addTask(inputTitle.value, inputDate.value, selectElement.value);
+        if (!result.success) {
+            alert(result.message)
+        } else {
+            resetForm(formElements);
+        }
     } else {
-        inputTitle.value = "";
-        inputDate.value = "";
-        selectElement.value = "low";
+        const result = updateTask(editingTaskId, {
+            title: formElements.inputTitle.value, 
+            dueDate: formElements.inputDate.value,
+            priority: formElements.selectElement.value});
+
+        if (!result.success) {
+            alert(result.message)
+        } else {
+            resetForm(formElements);
+        }
     }
+    
 }
 
-function handleTaskClick(event) {
+function handleTaskClick(event, { inputTitle, inputDate, selectElement, addOrUpdateElement }) {
     const statusButton = event.target.closest(".status-task");
     const deleteButton = event.target.closest(".delete-task");
+    const editButton = event.target.closest('[data-update-task]');
 
     if (statusButton) {
         const taskId = Number(statusButton.dataset.id);
@@ -129,11 +167,24 @@ function handleTaskClick(event) {
         deleteTask(taskId);
         return;
     }
+
+    if (editButton) {
+        const task = getTask(Number(editButton.dataset.id));
+        if (!task) return;
+
+        editingTaskId = task.id;
+        inputTitle.value = task.title;
+        inputDate.value = task.dueDate;
+        selectElement.value = task.priority;
+
+        renderAddOrUpdateButton(addOrUpdateElement);
+        inputTitle.focus();
+        return;
+    }
 }
 
 function handleFilterClick(event) {
     const filter = event.target.dataset.filter;
-    
     setFilter(filter);
 }
 
@@ -150,10 +201,11 @@ export function main() {
                 <div class="flex flex-col gap-y-2 md:flex-row *:w-full items-center gap-x-2">
                     <div class="flex">
                         <button
+                            data-add-update
                             type="submit"
                             class="text-muted-foreground cursor-pointer border-2 border-dashed border-r-0 bg-accent flex items-center justify-center p-1"
                         >
-                            <i data-lucide="plus" class="size-8"></i>
+                            
                         </button>
                         <input
                             name="task-title"
@@ -188,30 +240,36 @@ export function main() {
 
     const taskListElement = element.querySelector(".task-list");
     const form = element.querySelector("form");
+    const addOrUpdateElement = element.querySelector('[data-add-update]');
     const inputTitle = form.querySelector('[data-task-title]');
     const inputDate = form.querySelector('[data-task-date]')
+    const selectElement = element.querySelector('[data-task-priority]');  
     const filtersElement = element.querySelector(".filters");
     const titleElement = element.querySelector('[data-title]'); 
-    const selectElement = element.querySelector('[data-task-priority]');    
+    const formElements = { inputTitle, inputDate, selectElement, addOrUpdateElement }
 
     renderFilters(filtersElement);
     renderActiveFilter(filtersElement);
     renderTasks(taskListElement);
     renderTitle(titleElement);
+    renderAddOrUpdateButton(addOrUpdateElement);
 
     subscribe(() => renderTasks(taskListElement));
     subscribe(() => renderActiveFilter(filtersElement));
     subscribe(() => renderTitle(titleElement));
 
     createIcons({
-        icons: { Plus },
+        icons: { Plus, Edit },
         root: element
     });
 
-    form.addEventListener("submit", (e) => handleAddTask(e, inputTitle, inputDate, selectElement));
-    taskListElement.addEventListener("click", (e) => handleTaskClick(e));
+    form.addEventListener("submit", (e) => handleAddOrUpdateTask(e, formElements));
+    taskListElement.addEventListener("click", (e) => handleTaskClick(e, formElements));
     filtersElement.addEventListener("click", (e) => handleFilterClick(e));
+
     document.addEventListener("keydown", (e) => {
+        if (document.querySelector("dialog[open]")) return;
+
         const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName);
         if (e.key !== 'n' || isTyping) return;
         if (e.ctrlKey || e.metaKey || e.altKey) return;
