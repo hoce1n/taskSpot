@@ -60,11 +60,13 @@ function createTaskElement(task) {
     `;
 }
 
-function resetForm(formElements) {
+function resetForm(formElements, addOrUpdateElement) {
     formElements.inputTitle.value = "";
     formElements.inputDate.value = "";
     formElements.selectElement.value = "low";
-    formElements.editingTaskId = null;
+
+    editingTaskId = null;
+    renderAddOrUpdateButton(addOrUpdateElement);
 }
 
 function renderAddOrUpdateButton(addOrUpdateElement) {
@@ -125,29 +127,17 @@ function renderTitle(title) {
     return title;
 }
 
-function handleAddOrUpdateTask(event, formElements) {
+function handleAddOrUpdateTask(event, formElements, addOrUpdateElement) {
     event.preventDefault();
+    const result = editingTaskId === null
+        ? addTask(formElements.inputTitle.value, formElements.inputDate.value, formElements.selectElement.value)
+        : updateTask(editingTaskId, {title: formElements.inputTitle.value, dueDate: formElements.inputDate.value, priority: formElements.selectElement.value});
 
-    if (editingTaskId === null) {
-        const result = addTask(inputTitle.value, inputDate.value, selectElement.value);
-        if (!result.success) {
-            alert(result.message)
-        } else {
-            resetForm(formElements);
-        }
-    } else {
-        const result = updateTask(editingTaskId, {
-            title: formElements.inputTitle.value, 
-            dueDate: formElements.inputDate.value,
-            priority: formElements.selectElement.value});
-
-        if (!result.success) {
-            alert(result.message)
-        } else {
-            resetForm(formElements);
-        }
+    if (!result.success) {
+        alert(result.message);
+        return;
     }
-    
+    resetForm(formElements, addOrUpdateElement);
 }
 
 function handleTaskClick(event, { inputTitle, inputDate, selectElement, addOrUpdateElement }) {
@@ -263,12 +253,17 @@ export function main() {
         root: element
     });
 
-    form.addEventListener("submit", (e) => handleAddOrUpdateTask(e, formElements));
+    form.addEventListener("submit", (e) => handleAddOrUpdateTask(e, formElements, addOrUpdateElement));
     taskListElement.addEventListener("click", (e) => handleTaskClick(e, formElements));
     filtersElement.addEventListener("click", (e) => handleFilterClick(e));
 
     document.addEventListener("keydown", (e) => {
         if (document.querySelector("dialog[open]")) return;
+
+        if (e.key === "Escape" && editingTaskId !== null) {
+            resetForm(formElements, addOrUpdateElement);
+            return;
+        }
 
         const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName);
         if (e.key !== 'n' || isTyping) return;

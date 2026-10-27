@@ -50,7 +50,8 @@ const data = {
 }
 
 const shortcuts = [
-    { key: "n", label: "New task" }
+    { key: "n", label: "New task" },
+    { key: "esc", label: "Cancel editing"}
 ];
 
 function createShortcutItem(shortcut) {
