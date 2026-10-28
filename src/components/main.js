@@ -12,15 +12,15 @@ import { button } from "./ui/button";
 import { escapeHtml } from "#lib/utils";
 import { 
     addTask, 
+    updateTask,
     deleteTask, 
+    toggleTask, 
+    getTask,
     isCurrentFilter, 
     getFilteredTasks, 
     setFilter, 
-    toggleTask, 
-    subscribe,
     getCurrentSection,
-    updateTask,
-    getTask,
+    subscribe,
 } from "#lib/store";
 
 const priorityColors = {
@@ -60,13 +60,13 @@ function createTaskElement(task) {
     `;
 }
 
-function resetForm(formElements, addOrUpdateElement) {
+function resetForm(formElements) {
     formElements.inputTitle.value = "";
     formElements.inputDate.value = "";
     formElements.selectElement.value = "low";
 
     editingTaskId = null;
-    renderAddOrUpdateButton(addOrUpdateElement);
+    renderAddOrUpdateButton(formElements.addOrUpdateElement);
 }
 
 function renderAddOrUpdateButton(addOrUpdateElement) {
@@ -127,7 +127,7 @@ function renderTitle(title) {
     return title;
 }
 
-function handleAddOrUpdateTask(event, formElements, addOrUpdateElement) {
+function handleAddOrUpdateTask(event, formElements) {
     event.preventDefault();
     const result = editingTaskId === null
         ? addTask(formElements.inputTitle.value, formElements.inputDate.value, formElements.selectElement.value)
@@ -137,10 +137,10 @@ function handleAddOrUpdateTask(event, formElements, addOrUpdateElement) {
         alert(result.message);
         return;
     }
-    resetForm(formElements, addOrUpdateElement);
+    resetForm(formElements);
 }
 
-function handleTaskClick(event, { inputTitle, inputDate, selectElement, addOrUpdateElement }) {
+function handleTaskClick(event, formElements) {
     const statusButton = event.target.closest(".status-task");
     const deleteButton = event.target.closest(".delete-task");
     const editButton = event.target.closest('[data-update-task]');
@@ -154,6 +154,7 @@ function handleTaskClick(event, { inputTitle, inputDate, selectElement, addOrUpd
 
     if (deleteButton) {
         const taskId = Number(deleteButton.dataset.id);
+        if (taskId === editingTaskId) resetForm(formElements);
         deleteTask(taskId);
         return;
     }
@@ -163,12 +164,12 @@ function handleTaskClick(event, { inputTitle, inputDate, selectElement, addOrUpd
         if (!task) return;
 
         editingTaskId = task.id;
-        inputTitle.value = task.title;
-        inputDate.value = task.dueDate;
-        selectElement.value = task.priority;
+        formElements.inputTitle.value = task.title;
+        formElements.inputDate.value = task.dueDate;
+        formElements.selectElement.value = task.priority;
 
-        renderAddOrUpdateButton(addOrUpdateElement);
-        inputTitle.focus();
+        renderAddOrUpdateButton(formElements.addOrUpdateElement);
+        formElements.inputTitle.focus();
         return;
     }
 }
