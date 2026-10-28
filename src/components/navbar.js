@@ -14,20 +14,14 @@ function renderfirstChar(firstcharNameElement) {
 export function navbar () {
     const element = document.createElement("nav");
     element.className = "flex justify-between items-center py-3 px-3 lg:px-0 shadow-xs"
-    const data = {
-        appName: "task",
-        user: {
-            name: "hocein",
-        }
-    }
 
     element.innerHTML = `
         <div class="flex items-center gap-x-2">
             <span data-lucide="menu" class="size-5"></span>
-            <strong class="capitalize tracking-widest text-lg">${data.appName}</strong>
+            <strong class="capitalize tracking-widest text-lg">taskSpot</strong>
         </div>
         <div class="flex gap-x-2 items-center">
-            <span class="text-sm" data-name>${data.user.name}</span>
+            <span class="text-sm" data-name></span>
             <span class="flex justify-center items-center size-5 text-xs bg-primary text-primary-foreground p-1" data-first-char></span>
             <span id="toggleTheme" class="flex items-center"></span>
         </div>
