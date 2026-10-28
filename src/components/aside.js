@@ -1,5 +1,6 @@
 import { 
     getCompletedTasksDate,
+    getSectionCount,
     getTodayLeftTasks, 
     getUserName, 
     isCurrentSection, 
@@ -70,7 +71,10 @@ function createSidebarItem(item) {
             data-section="${item.label}"
         >
             <i data-lucide="${item.icon}" class="size-5"></i>
-            <span class="text-sm capitalize">${item.label}</span>
+            <div class="flex justify-between px-2 w-full">
+                <span class="text-sm capitalize">${item.label}</span>
+                <span class="text-[10px] rounded-full" data-count="${item.label}"></span>
+            </div>
         </li>
     `;
 }
@@ -97,6 +101,16 @@ function renderUserName(userNameElement) {
 
 function renderStreakCount(streakCountElement) {
     streakCountElement.textContent = calculateStreak(getCompletedTasksDate());
+}
+
+function renderSectionCounts(listElement) {
+    listElement.querySelectorAll('[data-count]').forEach((span) => {
+        const count = getSectionCount(span.dataset.count);
+        const isZero = count === 0;
+        span.classList.toggle("bg-secondary", !isZero);
+        span.classList.toggle("p-1", !isZero)
+        span.textContent = count ? count : "";
+    });
 }
 
 function handleSidebarClick(event, listElement, dialogElement) {
@@ -132,7 +146,7 @@ export function aside() {
                         <i data-lucide="flame" class="w-4 h-4 text-orange-500 fill-orange-500"></i> 
                         <b class="font-bold mt-0.5" data-streak></b>
                     </span>
-                    </div>
+                </div>
                 <p class="text-muted-foreground text-sm">${new Date().toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })} - <span data-task-left></span> left today</p>
             </div>
             <div>
@@ -161,16 +175,19 @@ export function aside() {
     const userNameElement = element.querySelector('[data-user-name]');
     const streakCountElement = element.querySelector('[data-streak]');
     const dialogElement = element.querySelector('[data-shortcuts-dialog]');
+
     
     renderTaskCount(taskCountElement);
     renderActiveSection(listElement);
     renderUserName(userNameElement);
     renderStreakCount(streakCountElement);
+    renderSectionCounts(listElement);
 
     subscribe(() => renderTaskCount(taskCountElement));
     subscribe(() => renderActiveSection(listElement));
     subscribe(() => renderUserName(userNameElement));
     subscribe(() => renderStreakCount(streakCountElement));
+    subscribe(() => renderSectionCounts(listElement));
     
     createIcons({
         icons: {

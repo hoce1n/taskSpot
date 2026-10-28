@@ -47,6 +47,10 @@ export function getCurrentSection() {
     return currentSection;
 }
 
+export function getSectionCount(section) {
+    return tasks.filter((task) => matchesSection(task, section)).length;
+}
+
 export function subscribe(listener) {
     listeners.push(listener);
 
