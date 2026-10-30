@@ -46,6 +46,8 @@ export function matchesSection(task, section) {
     const { dueDate, isDone } = task;
     const hasDate = dueDate !== null;
 
+    if (isDone && section !== "done") return false;
+
     switch (section) {
         case "today":
             return dueDate === today;
@@ -54,9 +56,9 @@ export function matchesSection(task, section) {
         case "upcoming":
             return hasDate && dueDate > tomorrow;
         case "overdue":
-            return hasDate && dueDate < today && !isDone;
+            return hasDate && dueDate < today;
         case "backlog":
-            return !hasDate && !isDone;
+            return !hasDate;
         case "done":
             return isDone;
         default:
