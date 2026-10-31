@@ -188,7 +188,7 @@ export function aside() {
     subscribe(() => renderUserName(userNameElement));
     subscribe(() => renderStreakCount(streakCountElement));
     subscribe(() => renderSectionCounts(listElement));
-    
+
     createIcons({
         icons: {
             Sun,
@@ -204,7 +204,7 @@ export function aside() {
     });
 
     listElement.addEventListener("click", (event) => handleSidebarClick(event, listElement, dialogElement));
-    userNameElement.addEventListener("click", (event) => handleSetUserName());
+    userNameElement.addEventListener("click", () => handleSetUserName());
     
     return element;
 }

@@ -15,6 +15,23 @@ const listeners = [];
 const sections = ["today", "tomorrow", "upcoming", "backlog", "overdue", "done"];
 const priorities = ["low", "medium", "high"];
 
+let isSidebarOpen = false;
+
+export function getSidebarStatus() {
+    return isSidebarOpen;
+}
+
+export function toggleSidebarStatus() {
+    isSidebarOpen = !isSidebarOpen;
+    
+    notify();
+}
+
+export function closeSidebar() {
+    if (!isSidebarOpen) return;
+    isSidebarOpen = false;
+    notify();
+}
 
 export function getUserName() {
     const name = localStorage.getItem(NAME_KEY) ?? "User";
@@ -46,6 +63,7 @@ export function setSection(section) {
 export function getCurrentSection() {
     return currentSection;
 }
+
 
 export function getSectionCount(section) {
     return tasks.filter((task) => matchesSection(task, section)).length;
@@ -128,14 +146,17 @@ function loadTasks() {
     }
 }
 
+export function findTask(id) {
+    return tasks.find((task) => task.id === id);
+}
+
 export function getTasks() {
-    return [...tasks];
+    return tasks.map(task => ({ ...task }));
 }
 
 export function getTask(id) {
-    const task = tasks.find((task) => task.id === id);
-    if (!task) return null;
-    return task;
+    const task = tasks.find(task => task.id === id);
+    return task ? { ...task } : null;
 }
 
 function saveTasks() {
@@ -163,7 +184,7 @@ export function addTask(title, dueDate, priority) {
 }
 
 export function updateTask(id, { title, dueDate, priority }) {
-    const task = getTask(id);
+    const task = findTask(id);
     if (!task) {
         return {
             success: false,
@@ -184,7 +205,7 @@ export function updateTask(id, { title, dueDate, priority }) {
 }
 
 export function toggleTask(id) {
-    const task = tasks.find((t) => t.id === id);
+    const task = findTask(id);
     if (!task) return;
 
     task.isDone = !task.isDone;
