@@ -1,6 +1,8 @@
 import { 
+    closeSidebar,
     getCompletedTasksDate,
     getSectionCount,
+    getSidebarStatus,
     getTodayLeftTasks, 
     getUserName, 
     isCurrentSection, 
@@ -113,6 +115,11 @@ function renderSectionCounts(listElement) {
     });
 }
 
+function renderSidebar(element) {
+    const isOpen = getSidebarStatus();
+    element.classList.toggle("hidden", !isOpen);
+}
+
 function handleSidebarClick(event, listElement, dialogElement) {
     const item = event.target.closest("li");
     
@@ -123,7 +130,8 @@ function handleSidebarClick(event, listElement, dialogElement) {
     }
     if (!item.dataset.section) return;
 
-    setSection(item.dataset.section);     
+    setSection(item.dataset.section);
+    closeSidebar();   
 }
 
 function handleSetUserName () {
@@ -136,9 +144,9 @@ function handleSetUserName () {
 
 export function aside() {
     const element = document.createElement("aside");
-    element.className = "w-1/3";
+    element.className = "hidden md:block md:w-1/3 max-md:absolute max-md:left-0 max-md:z-10 max-md:w-80 max-md:p-5 max-md:bg-background max-md:shadow-2xl";
     element.innerHTML = `
-        <div class="space-y-4 mt-4 hidden md:block">
+        <div class="space-y-4 mt-4">
             <div>
                 <div class="flex items-center justify-between">
                     <h4 class="font-bold">Good ${getGreeting(new Date().getHours())}, <span data-user-name class="cursor-pointer" title="Click on me."></span></h4>
@@ -182,12 +190,14 @@ export function aside() {
     renderUserName(userNameElement);
     renderStreakCount(streakCountElement);
     renderSectionCounts(listElement);
+    renderSidebar(element);
 
     subscribe(() => renderTaskCount(taskCountElement));
     subscribe(() => renderActiveSection(listElement));
     subscribe(() => renderUserName(userNameElement));
     subscribe(() => renderStreakCount(streakCountElement));
     subscribe(() => renderSectionCounts(listElement));
+    subscribe(() => renderSidebar(element));
 
     createIcons({
         icons: {

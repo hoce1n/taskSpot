@@ -23,7 +23,6 @@ export function getSidebarStatus() {
 
 export function toggleSidebarStatus() {
     isSidebarOpen = !isSidebarOpen;
-    
     notify();
 }
 
@@ -131,6 +130,20 @@ export function getCompletedTasksDate() {
     })
 
     return completedTasksDate;
+}""
+
+function isValidTask(task) {
+    return (
+        task !== null &&
+        typeof task === "object" &&
+        !Array.isArray(task) &&
+        Number.isInteger(task.id) &&
+        typeof task.title === "string" &&
+        (task.dueDate === null || isValidDateKey(task.dueDate)) &&
+        priorities.includes(task.priority) &&
+        typeof task.isDone === "boolean" &&
+        (task.completedAt === null || isValidDateKey(task.completedAt))
+    );
 }
 
 function loadTasks() {
@@ -139,12 +152,23 @@ function loadTasks() {
 
     try {
         const parsed = JSON.parse(item);
-        return Array.isArray(parsed) ? parsed : [];
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter(isValidTask);
     } catch (e) {
         console.warn("Failed to parse tasks form localStorage:", e);
         return [];
     }
 }
+
+window.addEventListener("storage", (event) => {
+    if (event.key === STORAGE_KEY) {
+        loadTasks();
+        notify();
+    }
+    if (event.key === NAME_KEY){
+        notify();
+    }
+})
 
 export function findTask(id) {
     return tasks.find((task) => task.id === id);

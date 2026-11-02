@@ -1,7 +1,6 @@
 import { createIcons, Menu } from "lucide";
 import { toggleTheme } from "./toggleTheme";
-import { getUserName, subscribe } from "#lib/store";
-
+import { getUserName, subscribe, toggleSidebarStatus } from "#lib/store";
 
 function renderName(nameElement) {
     nameElement.textContent = getUserName();
@@ -17,7 +16,9 @@ export function navbar () {
 
     element.innerHTML = `
         <div class="flex items-center gap-x-2">
-            <span data-lucide="menu" class="size-5"></span>
+            <button class="md:hidden cursor-pointer" data-sidebar-trigger>
+                <span data-lucide="menu" class="size-5"></span>
+            </button>
             <strong class="capitalize tracking-widest text-lg">taskSpot</strong>
         </div>
         <div class="flex gap-x-2 items-center">
@@ -32,7 +33,8 @@ export function navbar () {
     })
 
     const nameElement = element.querySelector('[data-name]');
-    const firstcharNameElement = element.querySelector('[data-first-char]')
+    const firstcharNameElement = element.querySelector('[data-first-char]');
+    const sidebarTriggerElement = element.querySelector('[data-sidebar-trigger]');    
     
     renderName(nameElement);
     renderfirstChar(firstcharNameElement);
@@ -43,6 +45,10 @@ export function navbar () {
     document.addEventListener("DOMContentLoaded", () => {
         const theme = document.getElementById("toggleTheme");
         theme.appendChild(toggleTheme())
+    });
+
+    sidebarTriggerElement.addEventListener("click", () => {
+        toggleSidebarStatus();
     })
     
     return element;
