@@ -175,8 +175,9 @@ function handleTaskClick(event, formElements) {
 }
 
 function handleFilterClick(event) {
-    const filter = event.target.dataset.filter;
-    setFilter(filter);
+    const button = event.target.closest('button[data-filter]');
+    if (!button) return;
+    setFilter(button.dataset.filter);
 }
 
 export function main() {
