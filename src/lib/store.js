@@ -5,6 +5,7 @@ const NAME_KEY = "taskspot:name";
 
 const MIN_TITLE_LENGTH = 3;
 
+const priorities = ["low", "medium", "high"];
 let tasks = loadTasks();
 
 let currentFilter = "all";
@@ -13,7 +14,6 @@ let currentSection = "today";
 const listeners = [];
 
 const sections = ["today", "tomorrow", "upcoming", "backlog", "overdue", "done"];
-const priorities = ["low", "medium", "high"];
 
 let isSidebarOpen = false;
 
@@ -130,7 +130,7 @@ export function getCompletedTasksDate() {
     })
 
     return completedTasksDate;
-}""
+}
 
 function isValidTask(task) {
     return (
@@ -162,7 +162,7 @@ function loadTasks() {
 
 window.addEventListener("storage", (event) => {
     if (event.key === STORAGE_KEY) {
-        loadTasks();
+        tasks = loadTasks();
         notify();
     }
     if (event.key === NAME_KEY){
