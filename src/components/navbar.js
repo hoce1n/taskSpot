@@ -3,18 +3,19 @@ import { toggleTheme } from "./toggleTheme";
 import { getUserName, subscribe, toggleSidebarStatus } from "#lib/store";
 
 function renderName(nameElement) {
-    nameElement.textContent = getUserName();
+  nameElement.textContent = getUserName();
 }
 
 function renderfirstChar(firstcharNameElement) {
-    firstcharNameElement.textContent = getUserName()[0];
+  firstcharNameElement.textContent = getUserName()[0];
 }
 
-export function navbar () {
-    const element = document.createElement("nav");
-    element.className = "flex justify-between items-center py-3 px-3 lg:px-0 shadow-xs"
+export function navbar() {
+  const element = document.createElement("nav");
+  element.className =
+    "flex justify-between items-center py-3 px-3 lg:px-0 shadow-xs";
 
-    element.innerHTML = `
+  element.innerHTML = `
         <div class="flex items-center gap-x-2">
             <button class="md:hidden cursor-pointer" data-sidebar-trigger>
                 <span data-lucide="menu" class="size-5"></span>
@@ -26,30 +27,30 @@ export function navbar () {
             <span class="flex justify-center items-center size-5 text-xs bg-primary text-primary-foreground p-1" data-first-char></span>
             <span id="toggleTheme" class="flex items-center"></span>
         </div>
-    `
-    createIcons({
-        icons: { Menu },
-        root: element
-    })
+    `;
+  createIcons({
+    icons: { Menu },
+    root: element,
+  });
 
-    const nameElement = element.querySelector('[data-name]');
-    const firstcharNameElement = element.querySelector('[data-first-char]');
-    const sidebarTriggerElement = element.querySelector('[data-sidebar-trigger]');    
-    
-    renderName(nameElement);
-    renderfirstChar(firstcharNameElement);
+  const nameElement = element.querySelector("[data-name]");
+  const firstcharNameElement = element.querySelector("[data-first-char]");
+  const sidebarTriggerElement = element.querySelector("[data-sidebar-trigger]");
 
-    subscribe(() => renderName(nameElement));
-    subscribe(() => renderfirstChar(firstcharNameElement));
-    
-    document.addEventListener("DOMContentLoaded", () => {
-        const theme = document.getElementById("toggleTheme");
-        theme.appendChild(toggleTheme())
-    });
+  renderName(nameElement);
+  renderfirstChar(firstcharNameElement);
 
-    sidebarTriggerElement.addEventListener("click", () => {
-        toggleSidebarStatus();
-    })
-    
-    return element;
+  subscribe(() => renderName(nameElement));
+  subscribe(() => renderfirstChar(firstcharNameElement));
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const theme = document.getElementById("toggleTheme");
+    theme.appendChild(toggleTheme());
+  });
+
+  sidebarTriggerElement.addEventListener("click", () => {
+    toggleSidebarStatus();
+  });
+
+  return element;
 }

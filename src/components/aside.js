@@ -1,73 +1,74 @@
-import { 
-    closeSidebar,
-    getCompletedTasksDate,
-    getSectionCount,
-    getSidebarStatus,
-    getTodayLeftTasks, 
-    getUserName, 
-    isCurrentSection, 
-    setSection, 
-    setUserName, 
-    subscribe 
-} from '#lib/store';
-import { calculateStreak, getGreeting } from '#lib/utils';
-import { 
-    createIcons, 
-    Sun, Calendar, 
-    Clock, 
-    Form, 
-    CircleCheck, 
-    Flame,
-    CircleQuestionMark,
-    RedoDot
-} from 'lucide';
+import {
+  closeSidebar,
+  getCompletedTasksDate,
+  getSectionCount,
+  getSidebarStatus,
+  getTodayLeftTasks,
+  getUserName,
+  isCurrentSection,
+  setSection,
+  setUserName,
+  subscribe,
+} from "#lib/store";
+import { calculateStreak, getGreeting } from "#lib/utils";
+import {
+  createIcons,
+  Sun,
+  Calendar,
+  Clock,
+  Form,
+  CircleCheck,
+  Flame,
+  CircleQuestionMark,
+  RedoDot,
+} from "lucide";
 
 const data = {
-    list: [
-        {
-            icon: "sun",
-            label: "today"
-        },
-        {
-            icon: "calendar",
-            label: "tomorrow"
-        },
-        {
-            icon: "clock",
-            label: "upcoming"
-        },
-        {
-            icon: "form",
-            label: "backlog"
-        },
-        {
-            icon: "redo-dot",
-            label: "overdue"
-        },
-        {
-            icon: "circle-check",
-            label: "done",
-            hadBorder: true
-        },
-    ]
-}
+  list: [
+    {
+      icon: "sun",
+      label: "today",
+    },
+    {
+      icon: "calendar",
+      label: "tomorrow",
+    },
+    {
+      icon: "clock",
+      label: "upcoming",
+    },
+    {
+      icon: "form",
+      label: "backlog",
+    },
+    {
+      icon: "redo-dot",
+      label: "overdue",
+    },
+    {
+      icon: "circle-check",
+      label: "done",
+      hadBorder: true,
+    },
+  ],
+};
 
 const shortcuts = [
-    { key: "n", label: "New task" },
-    { key: "esc", label: "Cancel editing"}
+  { key: "n", label: "New task" },
+  { key: "esc", label: "Cancel editing" },
 ];
 
 function createShortcutItem(shortcut) {
-    return `
+  return `
         <div class="flex items-center justify-between gap-8">
             <span class="text-sm">${shortcut.label}</span>
             <kbd class="border px-2 py-0.5 text-xs">${shortcut.key}</kbd>
         </div>
-    `
+    `;
 }
 
 function createSidebarItem(item) {
-    return `
+  return `
         <li
             class="flex items-center gap-3 py-2 px-3 cursor-pointer ${item.hadBorder ? "border mt-6 mb-10" : ""}"
             data-section="${item.label}"
@@ -82,70 +83,71 @@ function createSidebarItem(item) {
 }
 
 function renderSidebarList(list) {
-    return list.map(createSidebarItem).join("");
+  return list.map(createSidebarItem).join("");
 }
 
 function renderTaskCount(taskCountElement) {
-    const count = getTodayLeftTasks()
-    taskCountElement.textContent = count.length;
+  const count = getTodayLeftTasks();
+  taskCountElement.textContent = count.length;
 }
 
 function renderActiveSection(listElement) {
-    listElement.querySelectorAll("li").forEach((li) => {
-        const isActive = isCurrentSection(li.dataset.section);
-        li.classList.toggle("bg-accent", isActive);
-    })
+  listElement.querySelectorAll("li").forEach((li) => {
+    const isActive = isCurrentSection(li.dataset.section);
+    li.classList.toggle("bg-accent", isActive);
+  });
 }
- 
+
 function renderUserName(userNameElement) {
-    userNameElement.textContent = getUserName();
+  userNameElement.textContent = getUserName();
 }
 
 function renderStreakCount(streakCountElement) {
-    streakCountElement.textContent = calculateStreak(getCompletedTasksDate());
+  streakCountElement.textContent = calculateStreak(getCompletedTasksDate());
 }
 
 function renderSectionCounts(listElement) {
-    listElement.querySelectorAll('[data-count]').forEach((span) => {
-        const count = getSectionCount(span.dataset.count);
-        const isZero = count === 0;
-        span.classList.toggle("bg-secondary", !isZero);
-        span.classList.toggle("p-1", !isZero)
-        span.textContent = count ? count : "";
-    });
+  listElement.querySelectorAll("[data-count]").forEach((span) => {
+    const count = getSectionCount(span.dataset.count);
+    const isZero = count === 0;
+    span.classList.toggle("bg-secondary", !isZero);
+    span.classList.toggle("p-1", !isZero);
+    span.textContent = count ? count : "";
+  });
 }
 
 function renderSidebar(element) {
-    const isOpen = getSidebarStatus();
-    element.classList.toggle("hidden", !isOpen);
+  const isOpen = getSidebarStatus();
+  element.classList.toggle("hidden", !isOpen);
 }
 
 function handleSidebarClick(event, listElement, dialogElement) {
-    const item = event.target.closest("li");
-    
-    if (!item || !listElement.contains(item)) return;
-    if (item.dataset.action === "shortcuts") {
-        dialogElement.showModal();
-        return;
-    }
-    if (!item.dataset.section) return;
+  const item = event.target.closest("li");
 
-    setSection(item.dataset.section);
-    closeSidebar();   
+  if (!item || !listElement.contains(item)) return;
+  if (item.dataset.action === "shortcuts") {
+    dialogElement.showModal();
+    return;
+  }
+  if (!item.dataset.section) return;
+
+  setSection(item.dataset.section);
+  closeSidebar();
 }
 
-function handleSetUserName () {
-    const name = prompt("tell me about ur name.", getUserName());
-    const result = setUserName(name);
-    if (!result.success) {
-        alert(result.message);
-    }
+function handleSetUserName() {
+  const name = prompt("tell me about ur name.", getUserName());
+  const result = setUserName(name);
+  if (!result.success) {
+    alert(result.message);
+  }
 }
 
 export function aside() {
-    const element = document.createElement("aside");
-    element.className = "hidden md:block md:w-1/3 max-md:absolute max-md:left-0 max-md:z-10 max-md:w-80 max-md:p-5 max-md:bg-background max-md:shadow-2xl";
-    element.innerHTML = `
+  const element = document.createElement("aside");
+  element.className =
+    "hidden md:block md:w-1/3 max-md:absolute max-md:left-0 max-md:z-10 max-md:w-80 max-md:p-5 max-md:bg-background max-md:shadow-2xl";
+  element.innerHTML = `
         <div class="space-y-4 mt-4">
             <div>
                 <div class="flex items-center justify-between">
@@ -178,44 +180,44 @@ export function aside() {
         </div>
     `;
 
-    const listElement = element.querySelector("ul");
-    const taskCountElement = element.querySelector('[data-task-left]')
-    const userNameElement = element.querySelector('[data-user-name]');
-    const streakCountElement = element.querySelector('[data-streak]');
-    const dialogElement = element.querySelector('[data-shortcuts-dialog]');
+  const listElement = element.querySelector("ul");
+  const taskCountElement = element.querySelector("[data-task-left]");
+  const userNameElement = element.querySelector("[data-user-name]");
+  const streakCountElement = element.querySelector("[data-streak]");
+  const dialogElement = element.querySelector("[data-shortcuts-dialog]");
 
-    
-    renderTaskCount(taskCountElement);
-    renderActiveSection(listElement);
-    renderUserName(userNameElement);
-    renderStreakCount(streakCountElement);
-    renderSectionCounts(listElement);
-    renderSidebar(element);
+  renderTaskCount(taskCountElement);
+  renderActiveSection(listElement);
+  renderUserName(userNameElement);
+  renderStreakCount(streakCountElement);
+  renderSectionCounts(listElement);
+  renderSidebar(element);
 
-    subscribe(() => renderTaskCount(taskCountElement));
-    subscribe(() => renderActiveSection(listElement));
-    subscribe(() => renderUserName(userNameElement));
-    subscribe(() => renderStreakCount(streakCountElement));
-    subscribe(() => renderSectionCounts(listElement));
-    subscribe(() => renderSidebar(element));
+  subscribe(() => renderTaskCount(taskCountElement));
+  subscribe(() => renderActiveSection(listElement));
+  subscribe(() => renderUserName(userNameElement));
+  subscribe(() => renderStreakCount(streakCountElement));
+  subscribe(() => renderSectionCounts(listElement));
+  subscribe(() => renderSidebar(element));
 
-    createIcons({
-        icons: {
-            Sun,
-            Calendar,
-            Clock,
-            Form,
-            CircleCheck,
-            Flame,
-            CircleQuestionMark,
-            RedoDot
-        },
-        root: element
-    });
+  createIcons({
+    icons: {
+      Sun,
+      Calendar,
+      Clock,
+      Form,
+      CircleCheck,
+      Flame,
+      CircleQuestionMark,
+      RedoDot,
+    },
+    root: element,
+  });
 
-    listElement.addEventListener("click", (event) => handleSidebarClick(event, listElement, dialogElement));
-    userNameElement.addEventListener("click", () => handleSetUserName());
-    
-    return element;
+  listElement.addEventListener("click", (event) =>
+    handleSidebarClick(event, listElement, dialogElement),
+  );
+  userNameElement.addEventListener("click", () => handleSetUserName());
+
+  return element;
 }
-

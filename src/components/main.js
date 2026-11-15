@@ -1,40 +1,40 @@
-import { 
-    createIcons, 
-    Plus, 
-    ListChevronsUpDown, 
-    Check, 
-    X,
-    Trash,
-    Edit
+import {
+  createIcons,
+  Plus,
+  ListChevronsUpDown,
+  Check,
+  X,
+  Trash,
+  Edit,
 } from "lucide";
 
 import { button } from "./ui/button";
 import { escapeHtml } from "#lib/utils";
-import { 
-    addTask, 
-    updateTask,
-    deleteTask, 
-    toggleTask, 
-    getTask,
-    isCurrentFilter, 
-    getFilteredTasks, 
-    setFilter, 
-    getCurrentSection,
-    subscribe,
+import {
+  addTask,
+  updateTask,
+  deleteTask,
+  toggleTask,
+  getTask,
+  isCurrentFilter,
+  getFilteredTasks,
+  setFilter,
+  getCurrentSection,
+  subscribe,
 } from "#lib/store";
 
 const priorityColors = {
-    low: 'bg-blue-400 text-background',
-    medium: 'bg-yellow-100 text-yellow-800',
-    high: 'bg-destructive text-background'
+  low: "bg-blue-400 text-background",
+  medium: "bg-yellow-100 text-yellow-800",
+  high: "bg-destructive text-background",
 };
 
 let editingTaskId = null;
 
 function createTaskElement(task) {
-    const colorClass = priorityColors[task.priority];
-    
-    return `
+  const colorClass = priorityColors[task.priority];
+
+  return `
         <div class="flex items-center justify-between px-8 py-3 shadow-sm border h-15">
             <i data-lucide="list-chevrons-up-down" class="size-4"></i>
             <h6 class="text-sm font-semibold ${task.isDone ? "line-through opacity-60" : ""}">
@@ -43,8 +43,9 @@ function createTaskElement(task) {
             <span class="text-sm p-1 ${colorClass || ""}">${escapeHtml(task.priority)}</span>
             <span>${task.dueDate ? escapeHtml(task.dueDate) : ""}</span>
             <button class="status-task" data-id="${task.id}">
-                ${task.isDone 
-                    ? `<i data-lucide="check" class="size-4"></i>` 
+                ${
+                  task.isDone
+                    ? `<i data-lucide="check" class="size-4"></i>`
                     : `<i data-lucide="x" class="size-4"></i>`
                 }
             </button>
@@ -61,130 +62,139 @@ function createTaskElement(task) {
 }
 
 function resetForm(formElements) {
-    formElements.inputTitle.value = "";
-    formElements.inputDate.value = "";
-    formElements.selectElement.value = "low";
+  formElements.inputTitle.value = "";
+  formElements.inputDate.value = "";
+  formElements.selectElement.value = "low";
 
-    editingTaskId = null;
-    renderAddOrUpdateButton(formElements.addOrUpdateElement);
+  editingTaskId = null;
+  renderAddOrUpdateButton(formElements.addOrUpdateElement);
 }
 
 function renderAddOrUpdateButton(addOrUpdateElement) {
-    const icon = editingTaskId !== null ? "edit" : "plus";
-    
-    addOrUpdateElement.innerHTML = `<i data-lucide="${icon}" class="size-8"></i>`
-    createIcons({ icons: { Plus, Edit }, root: addOrUpdateElement });
+  const icon = editingTaskId !== null ? "edit" : "plus";
+
+  addOrUpdateElement.innerHTML = `<i data-lucide="${icon}" class="size-8"></i>`;
+  createIcons({ icons: { Plus, Edit }, root: addOrUpdateElement });
 }
 
 function renderTasks(taskListElement) {
-    const filtered = getFilteredTasks();
+  const filtered = getFilteredTasks();
 
-    if (filtered.length === 0) {
-        taskListElement.innerHTML = `<div class="text-muted-foreground text-sm">No tasks found.</div>`;
-        return;
-    }
+  if (filtered.length === 0) {
+    taskListElement.innerHTML = `<div class="text-muted-foreground text-sm">No tasks found.</div>`;
+    return;
+  }
 
-    taskListElement.innerHTML = filtered.map(createTaskElement).join("");
+  taskListElement.innerHTML = filtered.map(createTaskElement).join("");
 
-    createIcons({
-        icons: {
-            ListChevronsUpDown,
-            Check,
-            X,
-            Trash,
-            Edit
-        },
-        root: taskListElement
-    });
+  createIcons({
+    icons: {
+      ListChevronsUpDown,
+      Check,
+      X,
+      Trash,
+      Edit,
+    },
+    root: taskListElement,
+  });
 }
 
 function renderFilters(filtersElement) {
-    filtersElement.innerHTML = "";
-    filtersElement.append(
-        button("all", { dataset: { filter: "all" }, className: "w-full" }),
-        button("done", { dataset: { filter: "done" }, className: "w-full" }),
-        button("active", { dataset: { filter: "active" }, className: "w-full" })
-    );
+  filtersElement.innerHTML = "";
+  filtersElement.append(
+    button("all", { dataset: { filter: "all" }, className: "w-full" }),
+    button("done", { dataset: { filter: "done" }, className: "w-full" }),
+    button("active", { dataset: { filter: "active" }, className: "w-full" }),
+  );
 
-    renderActiveFilter(filtersElement);
+  renderActiveFilter(filtersElement);
 }
 
 function renderActiveFilter(filtersElement) {
-    const filterButtons = filtersElement.querySelectorAll("button");
+  const filterButtons = filtersElement.querySelectorAll("button");
 
-    filterButtons.forEach((filterButton) => {
-        const isActive =  isCurrentFilter(filterButton.dataset.filter);
-        
-        filterButton.classList.toggle("bg-primary!", isActive);
-        filterButton.classList.toggle("text-primary-foreground", isActive);
-    })
+  filterButtons.forEach((filterButton) => {
+    const isActive = isCurrentFilter(filterButton.dataset.filter);
+
+    filterButton.classList.toggle("bg-primary!", isActive);
+    filterButton.classList.toggle("text-primary-foreground", isActive);
+  });
 }
 
 function renderTitle(title) {
-    const currentSection = getCurrentSection();
-    
-    title.textContent = currentSection;
-    return title;
+  const currentSection = getCurrentSection();
+
+  title.textContent = currentSection;
+  return title;
 }
 
 function handleAddOrUpdateTask(event, formElements) {
-    event.preventDefault();
-    const result = editingTaskId === null
-        ? addTask(formElements.inputTitle.value, formElements.inputDate.value, formElements.selectElement.value)
-        : updateTask(editingTaskId, {title: formElements.inputTitle.value, dueDate: formElements.inputDate.value, priority: formElements.selectElement.value});
+  event.preventDefault();
+  const result =
+    editingTaskId === null
+      ? addTask(
+          formElements.inputTitle.value,
+          formElements.inputDate.value,
+          formElements.selectElement.value,
+        )
+      : updateTask(editingTaskId, {
+          title: formElements.inputTitle.value,
+          dueDate: formElements.inputDate.value,
+          priority: formElements.selectElement.value,
+        });
 
-    if (!result.success) {
-        alert(result.message);
-        return;
-    }
-    resetForm(formElements);
+  if (!result.success) {
+    alert(result.message);
+    return;
+  }
+  resetForm(formElements);
 }
 
 function handleTaskClick(event, formElements) {
-    const statusButton = event.target.closest(".status-task");
-    const deleteButton = event.target.closest(".delete-task");
-    const editButton = event.target.closest('[data-update-task]');
+  const statusButton = event.target.closest(".status-task");
+  const deleteButton = event.target.closest(".delete-task");
+  const editButton = event.target.closest("[data-update-task]");
 
-    if (statusButton) {
-        const taskId = Number(statusButton.dataset.id);
-        toggleTask(taskId);
+  if (statusButton) {
+    const taskId = Number(statusButton.dataset.id);
+    toggleTask(taskId);
 
-        return;
-    }
+    return;
+  }
 
-    if (deleteButton) {
-        const taskId = Number(deleteButton.dataset.id);
-        if (taskId === editingTaskId) resetForm(formElements);
-        deleteTask(taskId);
-        return;
-    }
+  if (deleteButton) {
+    const taskId = Number(deleteButton.dataset.id);
+    if (taskId === editingTaskId) resetForm(formElements);
+    deleteTask(taskId);
+    return;
+  }
 
-    if (editButton) {
-        const task = getTask(Number(editButton.dataset.id));
-        if (!task) return;
+  if (editButton) {
+    const task = getTask(Number(editButton.dataset.id));
+    if (!task) return;
 
-        editingTaskId = task.id;
-        formElements.inputTitle.value = task.title;
-        formElements.inputDate.value = task.dueDate;
-        formElements.selectElement.value = task.priority;
+    editingTaskId = task.id;
+    formElements.inputTitle.value = task.title;
+    formElements.inputDate.value = task.dueDate;
+    formElements.selectElement.value = task.priority;
 
-        renderAddOrUpdateButton(formElements.addOrUpdateElement);
-        formElements.inputTitle.focus();
-        return;
-    }
+    renderAddOrUpdateButton(formElements.addOrUpdateElement);
+    formElements.inputTitle.focus();
+    return;
+  }
 }
 
 function handleFilterClick(event) {
-    const button = event.target.closest('button[data-filter]');
-    if (!button) return;
-    setFilter(button.dataset.filter);
+  const button = event.target.closest("button[data-filter]");
+  if (!button) return;
+  setFilter(button.dataset.filter);
 }
 
 export function main() {
-    const element = document.createElement("section");
-    element.className = "w-full p-5";
+  const element = document.createElement("section");
+  element.className = "w-full p-5";
 
-    element.innerHTML = `
+  element.innerHTML = `
         <section class="space-y-5">
             <h1 data-title class="text-3xl font-bold px-4 tracking-widest uppercase"></h1>
             <div class="filters flex justify-around"></div>
@@ -230,50 +240,59 @@ export function main() {
         </section>
     `;
 
-    const taskListElement = element.querySelector(".task-list");
-    const form = element.querySelector("form");
-    const addOrUpdateElement = element.querySelector('[data-add-update]');
-    const inputTitle = form.querySelector('[data-task-title]');
-    const inputDate = form.querySelector('[data-task-date]')
-    const selectElement = element.querySelector('[data-task-priority]');  
-    const filtersElement = element.querySelector(".filters");
-    const titleElement = element.querySelector('[data-title]'); 
-    const formElements = { inputTitle, inputDate, selectElement, addOrUpdateElement }
+  const taskListElement = element.querySelector(".task-list");
+  const form = element.querySelector("form");
+  const addOrUpdateElement = element.querySelector("[data-add-update]");
+  const inputTitle = form.querySelector("[data-task-title]");
+  const inputDate = form.querySelector("[data-task-date]");
+  const selectElement = element.querySelector("[data-task-priority]");
+  const filtersElement = element.querySelector(".filters");
+  const titleElement = element.querySelector("[data-title]");
+  const formElements = {
+    inputTitle,
+    inputDate,
+    selectElement,
+    addOrUpdateElement,
+  };
 
-    renderFilters(filtersElement);
-    renderActiveFilter(filtersElement);
-    renderTasks(taskListElement);
-    renderTitle(titleElement);
-    renderAddOrUpdateButton(addOrUpdateElement);
+  renderFilters(filtersElement);
+  renderActiveFilter(filtersElement);
+  renderTasks(taskListElement);
+  renderTitle(titleElement);
+  renderAddOrUpdateButton(addOrUpdateElement);
 
-    subscribe(() => renderTasks(taskListElement));
-    subscribe(() => renderActiveFilter(filtersElement));
-    subscribe(() => renderTitle(titleElement));
+  subscribe(() => renderTasks(taskListElement));
+  subscribe(() => renderActiveFilter(filtersElement));
+  subscribe(() => renderTitle(titleElement));
 
-    createIcons({
-        icons: { Plus, Edit },
-        root: element
-    });
+  createIcons({
+    icons: { Plus, Edit },
+    root: element,
+  });
 
-    form.addEventListener("submit", (e) => handleAddOrUpdateTask(e, formElements, addOrUpdateElement));
-    taskListElement.addEventListener("click", (e) => handleTaskClick(e, formElements));
-    filtersElement.addEventListener("click", (e) => handleFilterClick(e));
+  form.addEventListener("submit", (e) =>
+    handleAddOrUpdateTask(e, formElements, addOrUpdateElement),
+  );
+  taskListElement.addEventListener("click", (e) =>
+    handleTaskClick(e, formElements),
+  );
+  filtersElement.addEventListener("click", (e) => handleFilterClick(e));
 
-    document.addEventListener("keydown", (e) => {
-        if (document.querySelector("dialog[open]")) return;
+  document.addEventListener("keydown", (e) => {
+    if (document.querySelector("dialog[open]")) return;
 
-        if (e.key === "Escape" && editingTaskId !== null) {
-            resetForm(formElements, addOrUpdateElement);
-            return;
-        }
+    if (e.key === "Escape" && editingTaskId !== null) {
+      resetForm(formElements, addOrUpdateElement);
+      return;
+    }
 
-        const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName);
-        if (e.key !== 'n' || isTyping) return;
-        if (e.ctrlKey || e.metaKey || e.altKey) return;
+    const isTyping = ["INPUT", "TEXTAREA", "SELECT"].includes(e.target.tagName);
+    if (e.key !== "n" || isTyping) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-        e.preventDefault();
-        inputTitle.focus();
-    })
+    e.preventDefault();
+    inputTitle.focus();
+  });
 
-    return element;
+  return element;
 }
